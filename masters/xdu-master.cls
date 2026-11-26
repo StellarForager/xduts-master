@@ -633,9 +633,9 @@
 \str_new:N \l__xdu_bio_str
 \keys_define:nn { xdu / info }
   {
-    graduate-type .choices:nn = { ^^^^7855^^^^58eb, ^^^^535a^^^^58eb }
+    graduate-type .choices:nn = { 硕士, 博士 }
       { \tl_set_eq:NN \l__xdu_gr_type_tl \l_keys_choice_tl },
-    degree-type .choices:nn = { ^^^^5b66^^^^672f, ^^^^4e13^^^^4e1a }
+    degree-type .choices:nn = { 学术, 专业 }
       { \tl_set_eq:NN \l__xdu_degree_type_tl \l_keys_choice_tl },
     degree .tl_set:N = \l__xdu_degree_str,
     degree* .tl_set:N = \l__xdu_degree_en_str,
@@ -656,7 +656,7 @@
     sub-major .tl_set:N = \l__xdu_sub_major_str,
     domain .tl_set:N = \l__xdu_domain_str,
     clc .tl_set:N = \l__xdu_clc_str,
-    secret-level .choices:nn = { ^^^^79d8^^^^5bc6, ^^^^516c^^^^5f00 }
+    secret-level .choices:nn = { 秘密, 公开 }
       { \tl_set_eq:NN \l__xdu_secret_lv_str \l_keys_choice_tl },
     submit-date .tl_set:N = \l__xdu_submit_date_str,
     statement-scan .tl_set:N = \l__xdu_statement_scan_str,
@@ -667,8 +667,8 @@
   }
 \keys_set:nn { xdu }
   {
-    info / graduate-type                = ^^^^7855^^^^58eb,
-    info / degree-type                  = ^^^^5b66^^^^672f,
+    info / graduate-type                = 硕士,
+    info / degree-type                  = 学术,
     info / degree                       = { },
     info / degree*                      = { },
     info / author*                      = { },
@@ -688,7 +688,7 @@
     info / sub-major                    = { },
     info / domain                       = { },
     info / clc                          = { },
-    info / secret-level                 = ^^^^516c^^^^5f00,
+    info / secret-level                 = 公开,
     info / submit-date                  = { },
     info / statement-scan               = { },
     info / statement-sign               = { },
@@ -769,43 +769,43 @@
 \bool_new:N \l__xdu_rm_bio_bool
 \ctex_at_end_preamble:n
   {
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^5c01^^^^9762 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 封面 }
       { \bool_set_true:N \l__xdu_rm_cover_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^63d0^^^^540d^^^^9875 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 提名页 }
       { \bool_set_true:N \l__xdu_rm_title_page_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^9898^^^^540d^^^^9875 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 题名页 }
       { \bool_set_true:N \l__xdu_rm_title_page_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^58f0^^^^660e^^^^9875 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 声明页 }
       { \bool_set_true:N \l__xdu_rm_statement_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^6458^^^^8981 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 摘要 }
       { \bool_set_true:N \l__xdu_rm_abstract_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^7d22^^^^5f15 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 索引 }
       {
         \bool_set_true:N \l__xdu_rm_lof_bool
         \bool_set_true:N \l__xdu_rm_lot_bool
       }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^63d2^^^^56fe^^^^7d22^^^^5f15 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 插图索引 }
       { \bool_set_true:N \l__xdu_rm_lof_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^8868^^^^683c^^^^7d22^^^^5f15 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 表格索引 }
       { \bool_set_true:N \l__xdu_rm_lot_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^5bf9^^^^7167^^^^8868 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 对照表 }
       {
         \bool_set_true:N \l__xdu_rm_los_bool
         \bool_set_true:N \l__xdu_rm_loa_bool
       }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^7b26^^^^53f7^^^^5bf9^^^^7167^^^^8868 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 符号对照表 }
       { \bool_set_true:N \l__xdu_rm_los_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^7f29^^^^7565^^^^8bed^^^^5bf9^^^^7167^^^^8868 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 缩略语对照表 }
       { \bool_set_true:N \l__xdu_rm_loa_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^76ee^^^^5f55 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 目录 }
       { \bool_set_true:N \l__xdu_rm_toc_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^9644^^^^5f55 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 附录 }
       { \bool_set_true:N \l__xdu_rm_appendix_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^53c2^^^^8003^^^^6587^^^^732e }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 参考文献 }
       { \bool_set_true:N \l__xdu_rm_ref_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^81f4^^^^8c22 }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 致谢 }
       { \bool_set_true:N \l__xdu_rm_ack_bool }
-    \clist_if_in:NnT \l__xdu_rm_page_clist { ^^^^4f5c^^^^8005^^^^7b80^^^^4ecb }
+    \clist_if_in:NnT \l__xdu_rm_page_clist { 作者简介 }
       { \bool_set_true:N \l__xdu_rm_bio_bool }
   }
 \bool_new:N \l__xdu_anon_bool
@@ -822,9 +822,9 @@
     \bool_if:NTF \l__xdu_anon_bool
       { #1 } { #2 }
   }
-\cs_set:Npn \figurename { \__xdu_lang_switch:nn { ^^^^56fe } { Figure } }
+\cs_set:Npn \figurename { \__xdu_lang_switch:nn { 图 } { Figure } }
 \cs_new_eq:NN \figname \figurename
-\cs_set:Npn \tablename  { \__xdu_lang_switch:nn { ^^^^8868 } { Table  } }
+\cs_set:Npn \tablename  { \__xdu_lang_switch:nn { 表 } { Table  } }
 \cs_new_eq:NN \tabname \tablename
 \bool_new:N \l__xdu_title_bold_math_bool
 \bool_new:N \l__xdu_en_cjk_font_bool
@@ -929,7 +929,7 @@
     style / before-skip             = { 24pt, 18bp, 12bp, 12bp, 12bp, 12bp },
     style / after-skip              = { 18bp, 12bp, 6bp, 6bp, 6bp, 6bp },
     style / symmetric-margin        = false,
-    style / page-vertical-align     = ^^^^9876^^^^90e8^^^^5bf9^^^^9f50
+    style / page-vertical-align     = 顶部对齐
   }
 \cs_new:Npn \__xdu_bold_math: { }
 \ctex_at_end_preamble:n
@@ -989,12 +989,12 @@
   {
     \__xdu_lang_switch:nn
       {
-        \tl_if_eq:NnTF \l__xdu_gr_type_tl { ^^^^7855^^^^58eb }
-          { \str_set:Nn \l__xdu_header_str { ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^7855^^^^58eb^^^^5b66^^^^4f4d^^^^8bba^^^^6587 } }
-          { \str_set:Nn \l__xdu_header_str { ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^535a^^^^58eb^^^^5b66^^^^4f4d^^^^8bba^^^^6587 } }
+        \tl_if_eq:NnTF \l__xdu_gr_type_tl { 硕士 }
+          { \str_set:Nn \l__xdu_header_str { 西安电子科技大学硕士学位论文 } }
+          { \str_set:Nn \l__xdu_header_str { 西安电子科技大学博士学位论文 } }
       }
       {
-        \tl_if_eq:NnTF \l__xdu_gr_type_tl { ^^^^7855^^^^58eb }
+        \tl_if_eq:NnTF \l__xdu_gr_type_tl { 硕士 }
           {
             \str_set:Nn \l__xdu_header_str
               { Master~Thesis~of~XIDIAN~UNIVERSITY }
@@ -1239,7 +1239,7 @@
   }
 \ctex_at_end_preamble:n
   {
-    \tl_if_eq:NnTF \l__xdu_page_v_align_tl { ^^^^9876^^^^90e8^^^^5bf9^^^^9f50 }
+    \tl_if_eq:NnTF \l__xdu_page_v_align_tl { 顶部对齐 }
       { \raggedbottom }
       { \flushbottom  }
   }
@@ -1247,16 +1247,16 @@
 \ctex_at_end_preamble:n
   {
     \__xdu_lang_switch:nn
-      { \ctexset { chapter / name = { ^^^^7b2c, ^^^^7ae0        } } }
+      { \ctexset { chapter / name = { 第, 章        } } }
       { \ctexset { chapter / name = { Chapter\space } } }
   }
 \ctexset
   {
     section       / name = {        },
     subsection    / name = {        },
-    subsubsection / name = { ^^^^ff08, ^^^^ff09 },
-    paragraph     / name = { ^^^^ff08, ^^^^ff09 },
-    subparagraph  / name = { ^^^^ff08, ^^^^ff09 }
+    subsubsection / name = { （, ） },
+    paragraph     / name = { （, ） },
+    subparagraph  / name = { （, ） }
   }
 \ctex_at_end_preamble:n
   {
@@ -1399,7 +1399,7 @@
         { \ALG@name        },
         { \algorithmcfname }
       }
-      { \cs_set:Npn #1 { \__xdu_lang_switch:nn { ^^^^7b97^^^^6cd5 } { Algorithm } } }
+      { \cs_set:Npn #1 { \__xdu_lang_switch:nn { 算法 } { Algorithm } } }
   }
 \PassOptionsToPackage { chapter } { algorithm }
 \ctex_at_end_preamble:n
@@ -1651,9 +1651,9 @@
               }
           }
         \DefTblrTemplate { conthead-text } { default }
-          { \__xdu_lang_switch:nn { ^^^^ff08^^^^7eed^^^^8868^^^^ff09 } { (Continued) } }
+          { \__xdu_lang_switch:nn { （续表） } { (Continued) } }
         \DefTblrTemplate { contfoot-text } { default }
-          { \__xdu_lang_switch:nn { ^^^^63a5^^^^4e0b^^^^9875 } { Continued~on~next~page } }
+          { \__xdu_lang_switch:nn { 接下页 } { Continued~on~next~page } }
       }
       { }
   }
@@ -1799,7 +1799,7 @@
         \str_if_eq:NNT { \l__xdu_lang_tl } { zh }
           {
             \RequirePackage { xspace }
-            \xspaceaddexceptions { ^^^^3002^^^^ff1f^^^^ff01^^^^ff0c^^^^3001^^^^ff1b^^^^ff1a^^^^201c^^^^201d^^^^2018^^^^2019^^^^2014^^^^2026.^^^^ff0d-^^^^ff5e^^^^00b7^^^^300a^^^^300b<>^^^^ff3f }
+            \xspaceaddexceptions { 。？！，、；：“”‘’—….－-～·《》<>＿ }
             \cs_generate_variant:Nn \str_if_in:nnTF { xnTF }
             \ctex_after_end_preamble:n
               {
@@ -1859,7 +1859,7 @@
   }
 \cs_new:Npn \__xdu_appendix:
   {
-    \cs_set:Npn \appendixname { \__xdu_lang_switch:nn { ^^^^9644^^^^5f55 } { Appendix } }
+    \cs_set:Npn \appendixname { \__xdu_lang_switch:nn { 附录 } { Appendix } }
     \tl_set_eq:NN \l__xdu_chaptername \appendixname
     \cs_set_eq:NN \__xdu_Roman: \__xdu_Alph:
     \appendix
@@ -1888,10 +1888,10 @@
 \bool_new:N \l__xdu_pro
 \ctex_at_end_preamble:n
   {
-    \tl_if_eq:NnTF \l__xdu_gr_type_tl { ^^^^7855^^^^58eb }
+    \tl_if_eq:NnTF \l__xdu_gr_type_tl { 硕士 }
       { \bool_set_true:N \l__xdu_master }
       { \bool_set_true:N \l__xdu_phd }
-    \tl_if_eq:NnTF \l__xdu_degree_type_tl { ^^^^5b66^^^^672f }
+    \tl_if_eq:NnTF \l__xdu_degree_type_tl { 学术 }
       { \bool_set_true:N \l__xdu_ac  }
       { \bool_set_true:N \l__xdu_pro }
   }
@@ -1923,7 +1923,7 @@
       }
   }
 \cs_new:Npn \__xdu_zh_today:
-  { \int_use:N \c_sys_year_int ^^^^5e74 \int_use:N \c_sys_month_int ^^^^6708 }
+  { \int_use:N \c_sys_year_int 年 \int_use:N \c_sys_month_int 月 }
 \cs_new:Npn \__xdu_en_today:
   { \__xdu_en_month:n { \c_sys_month_int } ~ \int_use:N \c_sys_year_int }
 \seq_new:N \l__xdu_submit_date_seq
@@ -1939,8 +1939,8 @@
       { \__xdu_zh_today: }
       {
         \__xdu_split_submit_date:N \l__xdu_submit_date_clist
-        \clist_item:Nn \l__xdu_submit_date_clist { 1 } ^^^^5e74
-        \clist_item:Nn \l__xdu_submit_date_clist { 2 } ^^^^6708
+        \clist_item:Nn \l__xdu_submit_date_clist { 1 } 年
+        \clist_item:Nn \l__xdu_submit_date_clist { 2 } 月
       }
   }
 \str_new:N \l__xdu_submit_date_month_str
@@ -1990,9 +1990,9 @@
         \__xdu_form_block:nnnn { 170.1 } { \bool_if:NTF \l__xdu_pro { 633.6 } { 676.1 } } { 300 }
           {
             \rmfamily \bfseries \zihao { 4 } \dim_set:Nn \baselineskip { 30bp }
-            \__xdu_cover_field:nn { ^^^^4f5c^^^^8005^^^^59d3^^^^540d } { \l__xdu_author_str }
+            \__xdu_cover_field:nn { 作者姓名 } { \l__xdu_author_str }
             \__xdu_cover_field:nn
-              { \bool_if:NTF \l__xdu_pro { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 } { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 } }
+              { \bool_if:NTF \l__xdu_pro { 学校导师姓名、职称 } { 指导教师姓名、职称 } }
               { \l__xdu_supv_str \enskip \l__xdu_supv_t_str }
             \str_if_empty:NF \l__xdu_supv_ii_str
               {
@@ -2001,9 +2001,9 @@
                 \par
               }
             \tl_if_empty:NF \l__xdu_supv_ent_str
-              { \__xdu_cover_field:nn { ^^^^4f01^^^^4e1a^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 }
+              { \__xdu_cover_field:nn { 企业导师姓名、职称 }
                   { \l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str } }
-            \__xdu_cover_field:nn { ^^^^7533^^^^8bf7^^^^5b66^^^^4f4d^^^^7c7b^^^^522b } { \l__xdu_degree_str }
+            \__xdu_cover_field:nn { 申请学位类别 } { \l__xdu_degree_str }
           }
       }
   }
@@ -2024,26 +2024,26 @@
           { \bool_if:NTF \l__xdu_pro { 93.8 } { 97.3 } } { 128 }
           {
             \rmfamily \bfseries \zihao { 5 } \dim_set:Nn \baselineskip { 18.3bp }
-            \__xdu_title_id:nn { ^^^^5b66^^^^6821^^^^4ee3^^^^7801 } { 10701 }
-            \__xdu_title_id:nn { ^^^^5206^^^^7c7b^^^^53f7 } { \l__xdu_clc_str }
+            \__xdu_title_id:nn { 学校代码 } { 10701 }
+            \__xdu_title_id:nn { 分类号 } { \l__xdu_clc_str }
           }
         \__xdu_form_block:nnnn
           { \bool_if:NTF \l__xdu_pro { 379.9 } { 394.1 } }
           { \bool_if:NTF \l__xdu_pro { 93.8 } { 97.3 } } { 128 }
           {
             \rmfamily \bfseries \zihao { 5 } \dim_set:Nn \baselineskip { 18.3bp }
-            \__xdu_title_id:nn { ^^^^5b66\enskip ^^^^53f7 } { \l__xdu_student_id_str }
-            \__xdu_title_id:nn { ^^^^5bc6\enskip ^^^^7ea7 } { \l__xdu_secret_lv_str }
+            \__xdu_title_id:nn { 学\enskip 号 } { \l__xdu_student_id_str }
+            \__xdu_title_id:nn { 密\enskip 级 } { \l__xdu_secret_lv_str }
           }
         \__xdu_form_block:nnnn { \bool_if:NTF \l__xdu_pro { 70.9 } { 85 } }
           { \bool_if:NTF \l__xdu_pro { 211 } { 214.1 } } { 439.4 }
           {
             \centering \rmfamily \CJKfamily { \CJKsfdefault } \zihao { 1 } \bfseries
-            ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66
+            西安电子科技大学
           }
         \__xdu_form_block:nnnn { \bool_if:NTF \l__xdu_pro { 70.9 } { 85 } }
           { \bool_if:NTF \l__xdu_pro { 301 } { 304.1 } } { 439.4 }
-          { \centering \rmfamily \zihao { -1 } \bfseries \l__xdu_gr_type_tl ^^^^5b66^^^^4f4d^^^^8bba^^^^6587 }
+          { \centering \rmfamily \zihao { -1 } \bfseries \l__xdu_gr_type_tl 学位论文 }
         \__xdu_form_block:nnnn { \bool_if:NTF \l__xdu_pro { 70.9 } { 85 } }
           { \bool_if:NTF \l__xdu_pro { 408.8 } { 412.6 } } { 439.4 }
           {
@@ -2054,24 +2054,24 @@
           { \bool_if:NTF \l__xdu_pro { 552.2 } { 555.9 } } { 297.6 }
           {
             \rmfamily \zihao { 4 } \dim_set:Nn \baselineskip { 32bp }
-            { \bfseries ^^^^4f5c^^^^8005^^^^59d3^^^^540d^^^^ff1a } \l__xdu_author_str \par
+            { \bfseries 作者姓名： } \l__xdu_author_str \par
             \bool_if:NTF \l__xdu_ac
               {
-                { \bfseries ^^^^4e00^^^^7ea7^^^^5b66^^^^79d1^^^^ff1a } \l__xdu_major_str \par
-                { \bfseries ^^^^4e8c^^^^7ea7^^^^5b66^^^^79d1^^^^ff08^^^^7814^^^^7a76^^^^65b9^^^^5411^^^^ff09^^^^ff1a } \l__xdu_sub_major_str \par
+                { \bfseries 一级学科： } \l__xdu_major_str \par
+                { \bfseries 二级学科（研究方向）： } \l__xdu_sub_major_str \par
               }
-              { { \bfseries ^^^^9886\qquad ^^^^57df^^^^ff1a } \l__xdu_domain_str \par }
-            { \bfseries ^^^^5b66^^^^4f4d^^^^7c7b^^^^522b^^^^ff1a } \l__xdu_degree_str \par
+              { { \bfseries 领\qquad 域： } \l__xdu_domain_str \par }
+            { \bfseries 学位类别： } \l__xdu_degree_str \par
             { \bfseries \bool_if:NTF \l__xdu_pro
-                { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a } { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a } }
+                { 学校导师姓名、职称： } { 指导教师姓名、职称： } }
             \l__xdu_supv_str \enskip \l__xdu_supv_t_str \par
             \str_if_empty:NF \l__xdu_supv_ii_str
               { \hspace{9em} \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str \par }
             \tl_if_empty:NF \l__xdu_supv_ent_str
-              { { \bfseries ^^^^4f01^^^^4e1a^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a }
+              { { \bfseries 企业导师姓名、职称： }
                 \l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str \par }
-            { \bfseries ^^^^5b66\qquad ^^^^9662^^^^ff1a } \l__xdu_dept_str \par
-            { \bfseries ^^^^63d0^^^^4ea4^^^^65e5^^^^671f^^^^ff1a } \__xdu_zh_submit_date:
+            { \bfseries 学\qquad 院： } \l__xdu_dept_str \par
+            { \bfseries 提交日期： } \__xdu_zh_submit_date:
           }
       }
   }
@@ -2124,9 +2124,9 @@
   }
 \cs_new_protected:Npn \__xdu_statement_scan_sign:nnnn #1#2#3#4
   {
-    #1^^^^ff1a\__xdu_statement_scan_sign_uline:n { #2 }
+    #1：\__xdu_statement_scan_sign_uline:n { #2 }
     \qquad
-    #3^^^^ff1a\__xdu_statement_scan_sign_uline:n { #4 }
+    #3：\__xdu_statement_scan_sign_uline:n { #4 }
   }
 \cs_new_protected:Npn \__xdu_statement:
   {
@@ -2135,58 +2135,58 @@
         \__xdu_form_block:nnnn { 85 } { 92.7 } { 439.4 }
           {
             \centering \rmfamily \zihao { 4 } \bfseries \dim_set:Nn \baselineskip { 20bp }
-            ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66\par
-            ^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^72ec^^^^521b^^^^6027^^^^ff08^^^^6216^^^^521b^^^^65b0^^^^6027^^^^ff09^^^^58f0^^^^660e
+            西安电子科技大学\par
+            学位论文独创性（或创新性）声明
           }
         \__xdu_form_block:nnnn { 85 } { 152.7 } { 439.4 }
           {
             \rmfamily \zihao { -4 } \dim_set:Nn \parindent { 2em }
             \dim_set:Nn \baselineskip { 20bp }
-            ^^^^79c9^^^^627f^^^^5b66^^^^6821^^^^4e25^^^^8c28^^^^7684^^^^5b66^^^^98ce^^^^548c^^^^4f18^^^^826f^^^^7684^^^^79d1^^^^5b66^^^^9053^^^^5fb7^^^^ff0c^^^^672c^^^^4eba^^^^58f0^^^^660e^^^^6240^^^^5448^^^^4ea4^^^^7684^^^^8bba^^^^6587^^^^662f^^^^6211^^^^4e2a^^^^4eba^^^^5728^^^^5bfc^^^^5e08^^^^6307^^^^5bfc^^^^4e0b^^^^8fdb^^^^884c^^^^7684^^^^7814^^^^7a76^^^^5de5^^^^4f5c^^^^53ca^^^^53d6^^^^5f97^^^^7684^^^^7814^^^^7a76^^^^6210^^^^679c^^^^3002^^^^5c3d^^^^6211^^^^6240^^^^77e5^^^^ff0c^^^^9664^^^^4e86^^^^6587^^^^4e2d^^^^7279^^^^522b^^^^52a0^^^^4ee5^^^^6807^^^^6ce8^^^^548c^^^^81f4^^^^8c22^^^^4e2d^^^^6240^^^^7f57^^^^5217^^^^7684^^^^5185^^^^5bb9^^^^4ee5^^^^5916^^^^ff0c^^^^8bba^^^^6587^^^^4e2d^^^^4e0d^^^^5305^^^^542b^^^^5176^^^^4ed6^^^^4eba^^^^5df2^^^^7ecf^^^^53d1^^^^8868^^^^6216^^^^64b0^^^^5199^^^^8fc7^^^^7684^^^^7814^^^^7a76^^^^6210^^^^679c^^^^ff1b^^^^4e5f^^^^4e0d^^^^5305^^^^542b^^^^4e3a^^^^83b7^^^^5f97^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^6216^^^^5176^^^^5b83^^^^6559^^^^80b2^^^^673a^^^^6784^^^^7684^^^^5b66^^^^4f4d^^^^6216^^^^8bc1^^^^4e66^^^^800c^^^^4f7f^^^^7528^^^^8fc7^^^^7684^^^^6750^^^^6599^^^^3002^^^^4e0e^^^^6211^^^^4e00^^^^540c^^^^5de5^^^^4f5c^^^^7684^^^^540c^^^^4e8b^^^^5bf9^^^^672c^^^^7814^^^^7a76^^^^6240^^^^505a^^^^7684^^^^4efb^^^^4f55^^^^8d21^^^^732e^^^^5747^^^^5df2^^^^5728^^^^8bba^^^^6587^^^^4e2d^^^^4f5c^^^^4e86^^^^660e^^^^786e^^^^7684^^^^8bf4^^^^660e^^^^5e76^^^^8868^^^^793a^^^^4e86^^^^8c22^^^^610f^^^^3002
+            秉承学校严谨的学风和优良的科学道德，本人声明所呈交的论文是我个人在导师指导下进行的研究工作及取得的研究成果。尽我所知，除了文中特别加以标注和致谢中所罗列的内容以外，论文中不包含其他人已经发表或撰写过的研究成果；也不包含为获得西安电子科技大学或其它教育机构的学位或证书而使用过的材料。与我一同工作的同事对本研究所做的任何贡献均已在论文中作了明确的说明并表示了谢意。
             \par
-            ^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^82e5^^^^6709^^^^4e0d^^^^5b9e^^^^4e4b^^^^5904^^^^ff0c^^^^672c^^^^4eba^^^^627f^^^^62c5^^^^4e00^^^^5207^^^^6cd5^^^^5f8b^^^^8d23^^^^4efb^^^^3002
+            学位论文若有不实之处，本人承担一切法律责任。
           }
         \__xdu_form_block:nnnn { 85 } { 292.7 } { 365 }
           {
             \rmfamily \zihao { -4 } \hspace{2em}
             \__xdu_statement_scan_sign:nnnn
-              { ^^^^672c^^^^4eba^^^^7b7e^^^^540d } { \clist_item:Nn \l__xdu_statement_sign_clist { 1 } }
-              { ^^^^65e5\qquad ^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 2 } }
+              { 本人签名 } { \clist_item:Nn \l__xdu_statement_sign_clist { 1 } }
+              { 日\qquad 期 } { \clist_item:Nn \l__xdu_statement_sign_clist { 2 } }
           }
         \__xdu_form_block:nnnn { 85 } { 452.7 } { 439.4 }
           {
             \centering \rmfamily \zihao { 4 } \bfseries \dim_set:Nn \baselineskip { 20bp }
-            ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66\par
-            ^^^^5173^^^^4e8e^^^^8bba^^^^6587^^^^4f7f^^^^7528^^^^6388^^^^6743^^^^7684^^^^8bf4^^^^660e
+            西安电子科技大学\par
+            关于论文使用授权的说明
           }
         \__xdu_form_block:nnnn { 85 } { 512.7 } { 439.4 }
           {
             \rmfamily \zihao { -4 } \dim_set:Nn \parindent { 2em }
             \dim_set:Nn \baselineskip { 20bp }
-            ^^^^672c^^^^4eba^^^^5b8c^^^^5168^^^^4e86^^^^89e3^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^6709^^^^5173^^^^4fdd^^^^7559^^^^548c^^^^4f7f^^^^7528^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^89c4^^^^5b9a^^^^ff0c^^^^5373^^^^ff1a^^^^7814^^^^7a76^^^^751f^^^^5728^^^^6821^^^^653b^^^^8bfb^^^^5b66^^^^4f4d^^^^671f^^^^95f4^^^^8bba^^^^6587^^^^5de5^^^^4f5c^^^^7684^^^^77e5^^^^8bc6^^^^4ea7^^^^6743^^^^5c5e^^^^4e8e^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^3002^^^^5b66^^^^6821^^^^6709^^^^6743^^^^4fdd^^^^7559^^^^5e76^^^^5411^^^^56fd^^^^5bb6^^^^6709^^^^5173^^^^90e8^^^^95e8^^^^6216^^^^673a^^^^6784^^^^9001^^^^4ea4^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^590d^^^^5370^^^^4ef6^^^^548c^^^^7535^^^^5b50^^^^7248^^^^ff0c^^^^4ee5^^^^5b66^^^^672f^^^^4ea4^^^^6d41^^^^4e3a^^^^76ee^^^^7684^^^^8d60^^^^9001^^^^548c^^^^4ea4^^^^6362^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^ff0c^^^^5141^^^^8bb8^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^88ab^^^^67e5^^^^9605^^^^3001^^^^501f^^^^9605^^^^548c^^^^590d^^^^5370^^^^ff0c^^^^5c06^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^5168^^^^90e8^^^^6216^^^^90e8^^^^5206^^^^5185^^^^5bb9^^^^7f16^^^^5165^^^^6709^^^^5173^^^^6570^^^^636e^^^^5e93^^^^8fdb^^^^884c^^^^68c0^^^^7d22^^^^548c^^^^63d0^^^^4f9b^^^^76f8^^^^5e94^^^^9605^^^^89c8^^^^670d^^^^52a1^^^^ff1b^^^^5141^^^^8bb8^^^^91c7^^^^7528^^^^5f71^^^^5370^^^^3001^^^^7f29^^^^5370^^^^6216^^^^5176^^^^5b83^^^^590d^^^^5236^^^^624b^^^^6bb5^^^^4fdd^^^^5b58^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^3002^^^^540c^^^^65f6^^^^672c^^^^4eba^^^^4fdd^^^^8bc1^^^^ff0c^^^^7ed3^^^^5408^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7814^^^^7a76^^^^6210^^^^679c^^^^5b8c^^^^6210^^^^7684^^^^8bba^^^^6587^^^^3001^^^^53d1^^^^660e^^^^4e13^^^^5229^^^^7b49^^^^6210^^^^679c^^^^ff0c^^^^7f72^^^^540d^^^^5355^^^^4f4d^^^^4e3a^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^3002
-            \par ^^^^672c^^^^4eba^^^^4fdd^^^^8bc1^^^^9075^^^^5b88^^^^4e0a^^^^8ff0^^^^89c4^^^^5b9a^^^^3002
-            \par ^^^^ff08^^^^4fdd^^^^5bc6^^^^7684^^^^8bba^^^^6587^^^^5728^^^^89e3^^^^5bc6^^^^540e^^^^9075^^^^5b88^^^^6b64^^^^89c4^^^^5b9a^^^^ff09
+            本人完全了解西安电子科技大学有关保留和使用学位论文的规定，即：研究生在校攻读学位期间论文工作的知识产权属于西安电子科技大学。学校有权保留并向国家有关部门或机构送交学位论文的复印件和电子版，以学术交流为目的赠送和交换学位论文，允许学位论文被查阅、借阅和复印，将学位论文的全部或部分内容编入有关数据库进行检索和提供相应阅览服务；允许采用影印、缩印或其它复制手段保存学位论文。同时本人保证，结合学位论文研究成果完成的论文、发明专利等成果，署名单位为西安电子科技大学。
+            \par 本人保证遵守上述规定。
+            \par （保密的论文在解密后遵守此规定）
           }
         \__xdu_form_block:nnnn { 85 } { 692.7 } { 365 }
           {
             \rmfamily \zihao { -4 } \dim_set:Nn \baselineskip { 40bp }
             \hspace{2em}
             \__xdu_statement_scan_sign:nnnn
-              { ^^^^672c^^^^4eba^^^^7b7e^^^^540d } { \clist_item:Nn \l__xdu_statement_sign_clist { 3 } }
-              { ^^^^5bfc^^^^5e08^^^^7b7e^^^^540d } { \clist_item:Nn \l__xdu_statement_sign_clist { 5 } }
+              { 本人签名 } { \clist_item:Nn \l__xdu_statement_sign_clist { 3 } }
+              { 导师签名 } { \clist_item:Nn \l__xdu_statement_sign_clist { 5 } }
             \par\hspace{2em}
             \__xdu_statement_scan_sign:nnnn
-              { ^^^^65e5\qquad ^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 4 } }
-              { ^^^^65e5\qquad ^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 6 } }
+              { 日\qquad 期 } { \clist_item:Nn \l__xdu_statement_sign_clist { 4 } }
+              { 日\qquad 期 } { \clist_item:Nn \l__xdu_statement_sign_clist { 6 } }
           }
       }
   }
 \cs_new:Npn \__xdu_zh_abstract_keywords:
   {
     \__xdu_n_chapter_head_toc:nn
-      { ^^^^6458^^^^8981 }
-      { \rmfamily \CJKfamily { \CJKsfdefault } \mdseries ^^^^6458^^^^8981 }
-    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^6458^^^^8981 } }
+      { 摘要 }
+      { \rmfamily \CJKfamily { \CJKsfdefault } \mdseries 摘要 }
+    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 摘要 } }
     \group_begin:
       \dim_set:Nn \parindent { 2 \ccwd }
       \rmfamily \zihao { -4 }
@@ -2200,9 +2200,9 @@
       \__xdu_typeout_keywords:nNn
         {
           \BeginAccSupp{method=hex,unicode,ActualText=51730020952E00208BCDFF1A}
-          \textbf { ^^^^5173\hspace{.25em}^^^^952e\hspace{.25em}^^^^8bcd^^^^ff1a }
+          \textbf { 关\hspace{.25em}键\hspace{.25em}词： }
           \EndAccSupp{}
-        } { \l__xdu_keywords_zh_clist } { ^^^^ff0c\space }
+        } { \l__xdu_keywords_zh_clist } { ，\space }
     \group_end:
     \cleardoublepage
   }
@@ -2259,8 +2259,8 @@
 \cs_new:Npn \__xdu_list_of_figure:
   {
     \__xdu_n_chapter_head_toc:n
-      { \__xdu_lang_switch:nn { ^^^^63d2^^^^56fe^^^^7d22^^^^5f15 } { List~of~Figures } }
-    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^63d2^^^^56fe^^^^7d22^^^^5f15 } }
+      { \__xdu_lang_switch:nn { 插图索引 } { List~of~Figures } }
+    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 插图索引 } }
     \group_begin:
       \renewcommand { \addvspace } [1] { }
       \tl_set:Nn \cftfigpresnum {  \figurename \space }
@@ -2280,8 +2280,8 @@
 \cs_new:Npn \__xdu_list_of_table:
   {
     \__xdu_n_chapter_head_toc:n
-      { \__xdu_lang_switch:nn { ^^^^8868^^^^683c^^^^7d22^^^^5f15 } { List~of~Tables } }
-    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^8868^^^^683c^^^^7d22^^^^5f15 } }
+      { \__xdu_lang_switch:nn { 表格索引 } { List~of~Tables } }
+    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 表格索引 } }
     \group_begin:
       \renewcommand { \addvspace } [1] { }
       \tl_set:Nn \cfttabpresnum {  \tablename \space }
@@ -2325,8 +2325,8 @@
 \cs_new:Npn \__xdu_symbols_list:
   {
     \__xdu_n_chapter_head_toc:n
-      { \__xdu_lang_switch:nn { ^^^^7b26^^^^53f7^^^^5bf9^^^^7167^^^^8868 } { List~of~Symbols } }
-    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^7b26^^^^53f7^^^^5bf9^^^^7167^^^^8868 } }
+      { \__xdu_lang_switch:nn { 符号对照表 } { List~of~Symbols } }
+    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 符号对照表 } }
     \bool_if:NTF \l__xdu_customize_los_bool
       {
         \group_begin:
@@ -2337,7 +2337,7 @@
       {
         \tl_new:N \l__xdu_los_head_tl
         \__xdu_lang_switch:nn
-          { \tl_set:Nn \l__xdu_los_head_tl { ^^^^7b26^^^^53f7 & ^^^^7b26^^^^53f7^^^^540d^^^^79f0 \\        } }
+          { \tl_set:Nn \l__xdu_los_head_tl { 符号 & 符号名称 \\        } }
           { \tl_set:Nn \l__xdu_los_head_tl { Notation & Description \\ } }
         \tl_new:N \l__xdu_los_rowhead_tl
         \bool_if:NTF \l__xdu_title_row_los_bool
@@ -2381,8 +2381,8 @@
 \cs_new:Npn \__xdu_abbreviations_list:
   {
     \__xdu_n_chapter_head_toc:n
-      { \__xdu_lang_switch:nn { ^^^^7f29^^^^7565^^^^8bed^^^^5bf9^^^^7167^^^^8868 } { List~of~Abbreviations } }
-    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^7f29^^^^7565^^^^8bed^^^^5bf9^^^^7167^^^^8868 } }
+      { \__xdu_lang_switch:nn { 缩略语对照表 } { List~of~Abbreviations } }
+    \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 缩略语对照表 } }
     \bool_if:NTF \l__xdu_customize_loa_bool
       {
         \group_begin:
@@ -2395,7 +2395,7 @@
         \__xdu_lang_switch:nn
           {
             \tl_set:Nn \l__xdu_loa_head_tl
-              { ^^^^7f29^^^^7565^^^^8bed & ^^^^82f1^^^^6587^^^^5168^^^^79f0 & ^^^^4e2d^^^^6587^^^^5bf9^^^^7167 \\ }
+              { 缩略语 & 英文全称 & 中文对照 \\ }
           }
           {
             \tl_set:Nn \l__xdu_loa_head_tl
@@ -2512,8 +2512,8 @@
       {
         \setcounter { tocdepth } { 2 }
         \__xdu_n_chapter_head:nn
-          { \__xdu_lang_switch:nn { ^^^^76ee^^^^5f55            } { Contents } }
-          { \__xdu_lang_switch:nn { ^^^^76ee^^^^5f55 } { Contents } }
+          { \__xdu_lang_switch:nn { 目录            } { Contents } }
+          { \__xdu_lang_switch:nn { 目录 } { Contents } }
         \group_begin:
           \rmfamily \zihao { -4 }
           \dim_set:Nn \baselineskip { 20bp }
@@ -2524,8 +2524,8 @@
           {
             \setcounter { tocdepth } { 2 }
             \__xdu_n_chapter_head:nn
-              { ^^^^76ee^^^^5f55 }
-              { \__xdu_sf_family: \mdseries ^^^^76ee { \quad } ^^^^5f55 }
+              { 目录 }
+              { \__xdu_sf_family: \mdseries 目 { \quad } 录 }
             \@starttoc { zh.toc }
             \cleardoublepage
           }
@@ -2550,7 +2550,7 @@
             \__xdu_org_chapter:n { ##1 }
             \__xdu_add_zh_toc:nn { chapter }
               {
-                \numberline { ^^^^7b2c \chinese { chapter } ^^^^7ae0 \hspace { .3em } }
+                \numberline { 第 \chinese { chapter } 章 \hspace { .3em } }
                 \IfNoValueTF { ##2 } { ##1 } { ##2 }
               }
           }
@@ -2646,9 +2646,9 @@
       { \addtocontents { toc } { \protect \XDUTocKeepLines { \int_use:N \l_tmpa_int } } }
     \bool_if:NF \l__xdu_rm_ref_bool
       {
-        \cs_set:Npn \bibname { \__xdu_lang_switch:nn { ^^^^53c2^^^^8003^^^^6587^^^^732e } { Bibliography } }
+        \cs_set:Npn \bibname { \__xdu_lang_switch:nn { 参考文献 } { Bibliography } }
         \__xdu_n_chapter_head_toc:n { \bibname }
-        \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^53c2^^^^8003^^^^6587^^^^732e } }
+        \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 参考文献 } }
       }
     \group_begin:
       \tl_if_eq:NnTF \l__xdu_bib_tool_tl { bibtex }
@@ -2668,9 +2668,9 @@
     \bool_lazy_or:nnT { \l__xdu_anon_bool } { ! \l__xdu_rm_ack_bool }
       {
         \__xdu_n_chapter_head_toc:nn
-          { \__xdu_lang_switch:nn { ^^^^81f4^^^^8c22            } { Acknowledgements } }
-          { \__xdu_lang_switch:nn { ^^^^81f4^^^^8c22 } { Acknowledgements } }
-        \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^81f4^^^^8c22 } }
+          { \__xdu_lang_switch:nn { 致谢            } { Acknowledgements } }
+          { \__xdu_lang_switch:nn { 致谢 } { Acknowledgements } }
+        \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 致谢 } }
         \group_begin:
           \dim_set:Nn \parindent { 2 \ccwd }
           \rmfamily \zihao { -4 }
@@ -2689,8 +2689,8 @@
     \bool_if:NF \l__xdu_rm_bio_bool
       {
         \__xdu_n_chapter_head_toc:n
-          { \__xdu_lang_switch:nn { ^^^^4f5c^^^^8005^^^^7b80^^^^4ecb } { Author~Biography } }
-        \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^4f5c^^^^8005^^^^7b80^^^^4ecb } }
+          { \__xdu_lang_switch:nn { 作者简介 } { Author~Biography } }
+        \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { 作者简介 } }
         \group_begin:
           \dim_set:Nn \parindent { 2 \ccwd }
           \rmfamily \zihao { -4 }

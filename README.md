@@ -15,11 +15,9 @@ In the future, we plan to add the following document class, including
 
 - `xdupgtp.cls`, Xidian University Postgraduate Thesis Proposal document class
 
-## Chinese master's thesis template
+## 中文硕士学位论文模板
 
-The [masters project](masters/README.md) contains the XeLaTeX template adjusted
-against Xidian University's January 2025 Word template, with academic,
-professional and anonymous-review entry points.
+[硕士论文模板](masters/README.md)以西安电子科技大学 2025 年 1 月版 Word 模板为依据，提供学术学位、专业学位和匿名评审的 XeLaTeX 编译入口。
 
 ## Preparation
 
