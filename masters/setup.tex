@@ -1,0 +1,51 @@
+\xdusetup{
+  style = {
+    language = zh,
+    ft-caption-align = centering,
+    customize-los = true,
+    customize-loa = true,
+    customize-resresult = false
+  },
+  info = {
+    graduate-type = ^^^^7855^^^^58eb,
+    degree-type = ^^^^5b66^^^^672f,
+    title = {Sample Thesis Title},
+    title* = {Sample Thesis Title},
+    author = {Example Author},
+    author* = {Example Author},
+    student-id = {0000000000},
+    supervisor = {Example Supervisor},
+    supervisor* = {Example Supervisor},
+    supervisor-title = {^^^^6559^^^^6388},
+    supervisor-title* = {Professor},
+    department = {Example School},
+    major = {^^^^8ba1^^^^7b97^^^^673a^^^^79d1^^^^5b66^^^^4e0e^^^^6280^^^^672f},
+    major* = {Computer Science and Technology},
+    sub-major = {Example Research Area},
+    degree = {^^^^5de5^^^^5b66^^^^7855^^^^58eb},
+    clc = {TP3},
+    secret-level = ^^^^516c^^^^5f00,
+    submit-date = {2025-01},
+    abstract = {front/abstract-zh.tex},
+    abstract* = {front/abstract-en.tex},
+    keywords = {example, template, typesetting},
+    keywords* = {example, template, typesetting},
+    los = {front/symbols.tex},
+    loa = {front/abbreviations.tex},
+    appendix = {back/appendix.tex},
+    bib-resource = {references.bib},
+    acknowledgements = {back/acknowledgements.tex},
+    bio = {back/bio.tex}
+  }
+}
+\ifdefined\XDUProfessional
+  \xdusetup{info={
+    degree-type = ^^^^4e13^^^^4e1a,
+    degree = {^^^^7535^^^^5b50^^^^4fe1^^^^606f^^^^7855^^^^58eb},
+    degree* = {Electronic Information},
+    domain = {^^^^8ba1^^^^7b97^^^^673a^^^^6280^^^^672f}
+  }}
+\fi
+\ifdefined\XDUBlindReview
+  \xdusetup{style/anonymous = true}
+\fi

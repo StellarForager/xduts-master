@@ -1,0 +1,1438 @@
+--- xdupgthesis.cls
++++ xdu-master.cls
+@@ -1,6 +1,9 @@
+ %%
+-%% This is file `xdupgthesis.cls',
+-%% generated with the docstrip utility.
++%% xdu-master.cls, a modified XDUTS xdupgthesis class for the XDU master's template.
++%% Based on XDUTS v6.2.9.0 (9f2c5c73554b8b9e2fd9db39998e39848bc79ac4).
++%% Local changes and regeneration: see README.md and xduts-master.patch.
++%% The modified work is distributed under LPPL 1.3c or later; status: maintained.
++%% The following copyright and maintenance notices apply to the upstream work.
+ %%
+ %% The original source files were:
+ %%
+@@ -28,8 +31,8 @@
+ %% 
+ \NeedsTeXFormat{LaTeX2e}
+ \RequirePackage{expl3}
+-\ProvidesExplClass{xdupgthesis}
+-  {2025/05/04}{6.2.9.0}
++\ProvidesExplClass{xdu-master}
++  {2026/11/26}{6.2.9.0-xdu-master.1}
+   {Xidian University Postgraduate Thesis document class}
+ \RequirePackage { xparse, l3keys2e }
+ \PassOptionsToPackage { no-math } { fontspec }
+@@ -39,7 +42,9 @@
+     a4paper,
+     zihao=-4,
+     sub4section,
+-    fontset    = none
++    fontset    = none,
++    twoside,
++    openright
+   }
+   { ctexbook }
+ \LoadClass { ctexbook }
+@@ -47,7 +52,7 @@
+ \geometry       { paper = a4paper }
+ \RequirePackage { fancyhdr        }
+ \RequirePackage { xeCJKfntef      }
+-\RequirePackage { graphicx        }
++\RequirePackage { graphicx, array }
+ \tl_new:N \l__xdu_cjk_font_tl
+ \tl_new:N \l__xdu_fake_bold_tl
+ \tl_new:N \l__xdu_fake_slant_tl
+@@ -96,6 +101,29 @@
+     style / font-type        = font,
+     style / font-path        = fonts
+   }
++\providecommand*{\XDUFontDirectory}{fonts/}
++\NewExpandableDocumentCommand \XDUFontOptions { m }
++  {
++    \file_if_exist:nT { \XDUFontDirectory #1 }
++      { Path = \XDUFontDirectory, }
++  }
++\prg_new_conditional:Npnn \__xdu_if_local_font_family:nnnn #1#2#3#4 { TF }
++  {
++    \bool_lazy_all:nTF
++      {
++        { \file_if_exist_p:n { \XDUFontDirectory #1 } }
++        { \file_if_exist_p:n { \XDUFontDirectory #2 } }
++        { \file_if_exist_p:n { \XDUFontDirectory #3 } }
++        { \file_if_exist_p:n { \XDUFontDirectory #4 } }
++      }
++      { \prg_return_true: }
++      { \prg_return_false: }
++  }
++\cs_new:Npn \__xdu_latin_path:nnnn #1#2#3#4
++  {
++    \__xdu_if_local_font_family:nnnnTF { #1 } { #2 } { #3 } { #4 }
++      { Path = \XDUFontDirectory, } { }
++  }
+ \cs_new:Npn \__xdu_select_font:nn #1#2
+   {
+     \str_if_eq:NNTF { \l__xdu_font_type_tl } { font }
+@@ -350,6 +378,7 @@
+   {
+     \setmainfont { #1 }
+       [
++        \__xdu_latin_path:nnnn { #1 } { #2 } { #3 } { #4 }
+         \__xdu_set_latin_font:nnn { #2 } { #3 } { #4 }
+       ]
+   }
+@@ -358,6 +387,7 @@
+     \setsansfont { #1 }
+       [
+         \__xdu_set_latin_sans_scale:
++        \__xdu_latin_path:nnnn { #1 } { #2 } { #3 } { #4 }
+         \__xdu_set_latin_font:nnn { #2 } { #3 } { #4 }
+       ]
+   }
+@@ -367,6 +397,7 @@
+       [
+         \__xdu_set_latin_mono_scale:
+         \__xdu_off_latin_ligatures:
++        \__xdu_latin_path:nnnn { #1 } { #2 } { #3 } { #4 }
+         \__xdu_set_latin_font:nnn { #2 } { #3 } { #4 }
+       ]
+   }
+@@ -485,7 +516,9 @@
+     \cs_new:cpn { __xdu_load_math_font_ #1 : }
+       {
+         \__xdu_load_unicode_math_pkg:
+-        \setmathfont { #2 }
++        \file_if_exist:nTF { \XDUFontDirectory #2 }
++          { \setmathfont [ Path = \XDUFontDirectory ] { #2 } }
++          { \setmathfont { #2 } }
+       }
+   }
+ \clist_map_inline:nn
+@@ -575,11 +608,6 @@
+   }
+ \str_new:N \l__xdu_supv_str
+ \str_new:N \l__xdu_supv_ii_str
+-\ctex_at_end_preamble:n
+-  {
+-    \str_set:Nx \l__xdu_supv_str    { \clist_item:Nn \l__xdu_supv_clist { 1 } }
+-    \str_set:Nx \l__xdu_supv_ii_str { \clist_item:Nn \l__xdu_supv_clist { 2 } }
+-  }
+ \tl_new:N \l__xdu_gr_type_tl
+ \tl_new:N \l__xdu_degree_type_tl
+ \str_new:N \l__xdu_degree_str
+@@ -674,8 +702,30 @@
+ \str_new:N \l__xdu_supv_ii_t_str
+ \str_new:N \l__xdu_supv_t_en_str
+ \str_new:N \l__xdu_supv_ii_t_en_str
+-\ctex_at_end_preamble:n
++\cs_new_protected:Npn \__xdu_clear_review_info:
+   {
++    \bool_if:NT \l__xdu_anon_bool
++      {
++        \tl_clear:N \l__xdu_author_str
++        \tl_clear:N \l__xdu_author_en_str
++        \tl_clear:N \l__xdu_student_id_str
++        \tl_clear:N \l__xdu_dept_str
++        \clist_clear:N \l__xdu_supv_clist
++        \clist_clear:N \l__xdu_supv_en_clist
++        \clist_clear:N \l__xdu_supv_t_clist
++        \clist_clear:N \l__xdu_supv_t_en_clist
++        \tl_clear:N \l__xdu_supv_ent_str
++        \tl_clear:N \l__xdu_supv_ent_en_str
++        \tl_clear:N \l__xdu_supv_ent_t_str
++        \tl_clear:N \l__xdu_supv_ent_t_en_str
++        \tl_clear:N \l__xdu_statement_scan_str
++        \clist_clear:N \l__xdu_statement_sign_clist
++      }
++  }
++\cs_new_protected:Npn \__xdu_prepare_supervisors:
++  {
++    \str_set:Nx \l__xdu_supv_str    { \clist_item:Nn \l__xdu_supv_clist { 1 } }
++    \str_set:Nx \l__xdu_supv_ii_str { \clist_item:Nn \l__xdu_supv_clist { 2 } }
+     \str_set:Nx \l__xdu_supv_en_str
+       { \clist_item:Nn \l__xdu_supv_en_clist   { 1 } }
+     \str_set:Nx \l__xdu_supv_ii_en_str
+@@ -876,8 +926,8 @@
+     style / algorithm-small-caption = true,
+     style / alg-small-font          = true,
+     style / algorithm-small-font    = true,
+-    style / before-skip             = { 24pt, 18pt, 12pt, 12pt, 12pt, 12pt },
+-    style / after-skip              = { 18pt, 12pt, 6pt, 6pt, 6pt, 6pt },
++    style / before-skip             = { 24pt, 18bp, 12bp, 12bp, 12bp, 12bp },
++    style / after-skip              = { 18bp, 12bp, 6bp, 6bp, 6bp, 6bp },
+     style / symmetric-margin        = false,
+     style / page-vertical-align     = ^^^^9876^^^^90e8^^^^5bf9^^^^9f50
+   }
+@@ -1057,24 +1107,22 @@
+     \tl_set:Nn \l__xdu_keywords_label_tl { #1 }
+     \dim_zero_new:N \l__xdu_keywords_label_dim
+     \__xdu_get_text_width:NV \l__xdu_keywords_label_dim \l__xdu_keywords_label_tl
++    \raggedright
+     \begin { list } { \l__xdu_keywords_label_tl }
+       {
+         \labelwidth  \l__xdu_keywords_label_dim
+         \labelsep    \c_zero_dim
+         \rightmargin \c_zero_dim
+         \leftmargin  \l__xdu_keywords_label_dim
++        \topsep 0pt
++        \partopsep 0pt
++        \itemsep 0pt
++        \parsep 0pt
+       }
+       \item \clist_use:Nnnn #2 { #3 } { #3 } { #3 }
+     \end { list }
+   }
+ \dim_new:N \l__xdu_str_dim
+-\box_new:N \l__xdu_str_box
+-\cs_new:Npn \__xdu_str_max_dim:Nn #1#2
+-  {
+-    \hbox_set:Nn \l__xdu_str_box { #2 }
+-    \dim_set:Nn \l__xdu_str_dim { \box_wd:N \l__xdu_str_box }
+-    \dim_set:Nn #1  { \dim_max:nn { \l__xdu_str_dim } { #1 } }
+-  }
+ \NewDocumentCommand \noauxwrite { m }
+   {
+     \if@filesw
+@@ -1087,25 +1135,25 @@
+   }
+ \newgeometry
+   {
+-    top           = 3.14cm,
+-    bottom        = 2.5cm,
++    top           = 3cm,
++    bottom        = 2cm,
+     inner         = 2.5cm,
+     outer         = 2.5cm,
+     bindingoffset = 0.5cm,
+-    headheight    = 60pt,
+-    headsep       = 10pt,
+-    foot          = 0.75cm
++    headheight    = 18bp,
++    headsep       = 6bp,
++    footskip      = 15bp
+   }
+ \savegeometry { main }
+ \newgeometry
+   {
+-    top        = 3.14cm,
+-    bottom     = 2.5cm,
++    top        = 3cm,
++    bottom     = 2cm,
+     inner      = 2.75cm,
+     outer      = 2.75cm,
+-    headheight = 60pt,
+-    headsep    = 10pt,
+-    foot       = 0.75cm
++    headheight = 18bp,
++    headsep    = 6bp,
++    footskip   = 15bp
+   }
+ \savegeometry { main-sym }
+ \newgeometry
+@@ -1149,6 +1197,7 @@
+       }
+       { }
+   }
++\bool_new:N \l__xdu_front_page_bool
+ \fancypagestyle { plain }
+   {
+     \pagestyle { fancy }
+@@ -1160,8 +1209,20 @@
+       }
+     \bool_if:NTF \l__xdu_rm_footer_bool
+       { \fancyfoot [ C ] { } }
+-      { \fancyfoot [ C ] { \__xdu_rm_family: \zihao { -5 } \thepage } }
+-    \cs_set:Npn \headrulewidth { 0.5pt }
++      {
++        \fancyfoot [ C ]
++          {
++            \smash
++              {
++                \raisebox{12bp}
++                  {
++                    \bool_if:NTF \l__xdu_front_page_bool { \rmfamily } { \CJKfamily+{rm} }
++                    \zihao{-5}\thepage
++                  }
++              }
++          }
++      }
++    \cs_set:Npn \headrulewidth { 0.5bp }
+     \bool_if:NTF \l__xdu_rm_header_bool
+       { \cs_set:Npn \headrule { } }
+       {
+@@ -1176,20 +1237,13 @@
+           }
+       }
+   }
+-\fancypagestyle { front }
+-  {
+-    \pagestyle { plain }
+-    \bool_if:NTF \l__xdu_rm_footer_bool
+-      { \fancyfoot [ C ] { } }
+-      { \fancyfoot [ C ] { \rmfamily \zihao { -5 } \thepage } }
+-  }
+ \ctex_at_end_preamble:n
+   {
+     \tl_if_eq:NnTF \l__xdu_page_v_align_tl { ^^^^9876^^^^90e8^^^^5bf9^^^^9f50 }
+       { \raggedbottom }
+       { \flushbottom  }
+   }
+-\ctexset { secnumdepth=5 }
++\ctexset { secnumdepth=3 }
+ \ctex_at_end_preamble:n
+   {
+     \__xdu_lang_switch:nn
+@@ -1223,18 +1277,18 @@
+     \__xdu_rm_family:
+     \bfseries \__xdu_bold_math:
+     \zihao { #1 }
+-    \dim_set:Nn \baselineskip { 20pt }
++    \dim_set:Nn \baselineskip { 20bp }
+   }
+ \cs_new:Npn \__xdu_sec_format_ii:
+   {
+-    \__xdu_sf_family:
++    \rmfamily \CJKfamily { \CJKsfdefault }
+     \centering
+     \__xdu_bold_math:
+     \zihao { 3 }
+-    \dim_set:Nn \baselineskip { 20pt }
++    \dim_set:Nn \baselineskip { 20bp }
+   }
+ \cs_new:Npn \__xdu_sec_format_iii:
+-  { \__xdu_rm_family: \centering \zihao { 3 } \dim_set:Nn \baselineskip { 20pt } }
++  { \__xdu_rm_family: \centering \zihao { 3 } \dim_set:Nn \baselineskip { 20bp } }
+ \ctex_at_end_preamble:n
+   {
+     \__xdu_lang_switch:nn
+@@ -1251,7 +1305,7 @@
+   }
+ \ctexset
+   {
+-    chapter       / aftername = { \quad   },
++    chapter       / aftername = { \hspace{1.5em} },
+     section       / aftername = { \enskip },
+     subsection    / aftername = { \enskip },
+     subsubsection / aftername = { },
+@@ -1269,18 +1323,20 @@
+   }
+ \ctexset
+   {
+-    chapter       / beforeskip = { 6pt  },
+-    section       / beforeskip = { 18pt },
+-    subsection    / beforeskip = { 12pt },
+-    subsubsection / beforeskip = { 12pt },
+-    paragraph     / beforeskip = { 12pt },
+-    subparagraph  / beforeskip = { 12pt },
+-    chapter       / afterskip  = { 18pt },
+-    section       / afterskip  = { 12pt },
+-    subsection    / afterskip  = { 6pt  },
+-    subsubsection / afterskip  = { 6pt  },
+-    paragraph     / afterskip  = { 6pt  },
+-    subparagraph  / afterskip  = { 6pt  }
++    % CTeX's starred vspace contributes topskip and the first line's
++    % baseline allowance. Preserve the Word layout's 24 bp before the heading.
++    chapter       / beforeskip = { \dim_eval:n { 24bp - \topskip - 10bp } },
++    section       / beforeskip = { 18bp },
++    subsection    / beforeskip = { 12bp },
++    subsubsection / beforeskip = { 12bp },
++    paragraph     / beforeskip = { 12bp },
++    subparagraph  / beforeskip = { 12bp },
++    chapter       / afterskip  = { 18bp },
++    section       / afterskip  = { 12bp },
++    subsection    / afterskip  = { 6bp  },
++    subsubsection / afterskip  = { 6bp  },
++    paragraph     / afterskip  = { 6bp  },
++    subparagraph  / afterskip  = { 6bp  }
+   }
+ \PassOptionsToPackage { titles } { tocloft }
+ \RequirePackage { tocloft }
+@@ -1290,7 +1346,7 @@
+ \ctex_at_end_preamble:n
+   {
+     \__xdu_lang_switch:nn
+-      { \cs_set:Npn \cftchapfont { \__xdu_sf_family: \__xdu_bold_math: \zihao { -4 } } }
++      { \cs_set:Npn \cftchapfont { \rmfamily \CJKfamily { \CJKsfdefault } \__xdu_bold_math: \zihao { -4 } } }
+       { \cs_set:Npn \cftchapfont { \__xdu_rm_family: \zihao { -4 } } }
+   }
+ \clist_map_inline:nn
+@@ -1405,7 +1461,13 @@
+   }
+ \captionsetup [ subfigure ] { strut = on, skip = 0pt }
+ \captionsetup [ subtable  ] { strut = on, skip = 0pt }
+-\dim_set_eq:NN \intextsep \abovecaptionskip
++\skip_set:Nn \intextsep    { 20bp }
++\skip_set:Nn \textfloatsep { 20bp }
++\skip_set:Nn \floatsep     { 20bp }
++\DeclareCaptionFont { xdufixedline } { \dim_set:Nn \baselineskip { 20bp } }
++\captionsetup [ table ] { font = { customfont, xdufixedline }, position = top }
++\captionsetup [ figure ] { position = bottom }
++\dim_set:Nn \arrayrulewidth { 0.5bp }
+ \ctex_at_end_preamble:n
+   {
+     \tl_if_eq:NnTF \l__xdu_ft_cap_format_tl { hang }
+@@ -1600,17 +1662,17 @@
+     \tl_if_eq:NnTF \l__xdu_figure_align_tl { left }
+       {
+           \AtBeginEnvironment { figure }
+-            { \g@addto@macro { \@floatboxreset } { \raggedright } }
++            { \appto { \@floatboxreset } { \raggedright } }
+       }
+       {
+         \tl_if_eq:NnTF \l__xdu_figure_align_tl { centering }
+           {
+             \AtBeginEnvironment { figure }
+-              { \g@addto@macro { \@floatboxreset } { \centering } }
++              { \appto { \@floatboxreset } { \centering } }
+           }
+           {
+             \AtBeginEnvironment { figure }
+-              { \g@addto@macro { \@floatboxreset } { \raggedleft } }
++              { \appto { \@floatboxreset } { \raggedleft } }
+           }
+       }
+   }
+@@ -1637,17 +1699,17 @@
+     \tl_if_eq:NnTF \l__xdu_table_align_tl { left }
+       {
+           \AtBeginEnvironment { table }
+-            { \g@addto@macro { \@floatboxreset } { \raggedright } }
++            { \appto { \@floatboxreset } { \raggedright } }
+       }
+       {
+         \tl_if_eq:NnTF \l__xdu_table_align_tl { centering }
+           {
+             \AtBeginEnvironment { table }
+-              { \g@addto@macro { \@floatboxreset } { \centering } }
++              { \appto { \@floatboxreset } { \centering } }
+           }
+           {
+             \AtBeginEnvironment { table }
+-              { \g@addto@macro { \@floatboxreset } { \raggedleft } }
++              { \appto { \@floatboxreset } { \raggedleft } }
+           }
+       }
+   }
+@@ -1656,9 +1718,27 @@
+     \bool_if:NT \l__xdu_tab_small_bool
+       {
+         \AtBeginEnvironment { table }
+-          { \g@addto@macro { \@floatboxreset } { \small } }
++          { \appto { \@floatboxreset } { \rmfamily \zihao { 5 } \XDUFixedTableRows } }
+       }
+   }
++\bool_new:N \l__xdu_glossary_table_bool
++\NewDocumentCommand \XDUFixedTableRows { }
++  {
++    \dim_set:Nn \baselineskip { 20bp }
++    \dim_zero:N \extrarowheight
++    \cs_set:Npn \arraystretch { 1 }
++    \hbox_set:Nn \strutbox { \rule[-5.5bp]{0pt}{20bp} }
++  }
++\NewDocumentEnvironment { XDUGlossary } { m }
++  {
++    \bool_set_true:N \l__xdu_glossary_table_bool
++    \rmfamily \zihao { -4 } \XDUFixedTableRows
++    \skip_set:Nn \LTpre { 4bp }
++    \skip_zero:N \LTpost
++    \begin { longtable } [l] { #1 }
++  }
++  { \end { longtable } }
++
+ \ctex_at_end_preamble:n
+   {
+     \@ifpackageloaded { longtable }
+@@ -1667,7 +1747,14 @@
+           {
+             \ctex_gadd_ltxhook:nn
+               { env/longtable/begin }
+-              { \small }
++              {
++                \bool_if:NF \l__xdu_glossary_table_bool
++                  {
++                    \rmfamily \zihao { 5 } \XDUFixedTableRows
++                    \skip_set:Nn \LTpre { 20bp }
++                    \skip_set:Nn \LTpost { 20bp }
++                  }
++              }
+           }
+       }
+       { }
+@@ -1688,6 +1775,7 @@
+       }
+       { }
+   }
++\RequirePackage { xurl }
+ \RequirePackage { hyperref }
+ \hypersetup
+   {
+@@ -1700,8 +1788,8 @@
+       {
+         pdftitle   = \l__xdu_pure_title_tl,
+         pdfsubject = \l__xdu_header_str,
+-        pdfcreator = { XeLaTeX~with~xdupgthesis~class~in~XDUTS },
+-        pdfauthor  = \l__xdu_author_str
++        pdfcreator = { XeLaTeX~with~the~XDUTS~XDU~master~template },
++        pdfauthor  = { \bool_if:NF \l__xdu_anon_bool { \l__xdu_author_str } }
+       }
+   }
+ \ctex_at_end_preamble:n
+@@ -1732,7 +1820,7 @@
+ \cs_new_protected:Npn \__xdu_begin_document:n #1
+   { \ctex_gadd_ltxhook:nn { env/document/begin } { #1 } }
+ \PassOptionsToPackage { sort&compress       } { gbt7714  }
+-\PassOptionsToPackage { style = gb7714-2015 } { biblatex }
++\PassOptionsToPackage { style = gb7714-2005, sorting = none, maxbibnames = 3, minbibnames = 3 } { biblatex }
+ \__xdu_begin_document:n
+   {
+     \tl_if_eq:NnTF \l__xdu_bib_tool_tl { bibtex }
+@@ -1758,7 +1846,7 @@
+       {
+         \rmfamily
+         \zihao { 5 }
+-        \dim_set:Nn \baselineskip { 20pt }
++        \dim_set:Nn \baselineskip { 20bp }
+       }
+   }
+ \ctex_at_end_preamble:n
+@@ -1775,8 +1863,8 @@
+     \tl_set_eq:NN \l__xdu_chaptername \appendixname
+     \cs_set_eq:NN \__xdu_Roman: \__xdu_Alph:
+     \appendix
+-    \renewcommand { \thefigure } { \thechapter \arabic { figure } }
+-    \renewcommand { \thetable  } { \thechapter \arabic { table  } }
++    \renewcommand { \thefigure } { \thechapter . \arabic { figure } }
++    \renewcommand { \thetable  } { \thechapter . \arabic { table  } }
+     \cs_if_exist:NT \thealgorithm
+       { \cs_set:Npn \thealgorithm { \thechapter \arabic { algorithm } } }
+     \cs_if_exist:NT \thealgocf
+@@ -1807,53 +1895,6 @@
+       { \bool_set_true:N \l__xdu_ac  }
+       { \bool_set_true:N \l__xdu_pro }
+   }
+-\cs_new:Npn \__xdu_cover_i:nnnnn #1#2#3#4#5
+-  {
+-    \dim_set:Nn \baselineskip { 20pt }
+-    \vbox_to_ht:nn { #1 }
+-      {
+-        \vfill
+-        \mode_leave_vertical:
+-        \hfil
+-        \use:c { #2 family } \zihao { #3 }
+-        \str_if_eq:nnTF { #4 } { bf } { \bfseries } { }
+-        #5
+-        \hfil
+-      }
+-  }
+-\cs_new:Npn \__xdu_cover_ii:nnnn #1#2#3#4
+-  {
+-    \dim_set:Nn \baselineskip { 20pt }
+-    \vbox_to_ht:nn { 25pt }
+-      {
+-        \vfill
+-        \mode_leave_vertical:
+-        \hfil
+-        \hbox:n
+-          {
+-            \zihao { 4 } \bfseries
+-            \hbox_to_wd:nn { #1 } { \sffamily #2 }
+-            \skip_horizontal:n { 0.5em }
+-            \__xdu_uline:n
+-              {
+-                \skip_horizontal:n { 9em - #1 }
+-                \hbox_to_wd:nn { #3 } { \hfil \rmfamily #4 \hfil }
+-              }
+-          }
+-        \hfil
+-      }
+-  }
+-\cs_new:Npn \__xdu_cover_iii:nnnn #1#2#3#4
+-  {
+-    \dim_set:Nn \baselineskip { 20pt }
+-    \hbox:n
+-      {
+-        \rmfamily \zihao { 5 } \bfseries
+-        \hbox_to_wd:nn { #1 } { #2 }
+-        \skip_horizontal:n { 0.5em }
+-        \__xdu_uline:n { \hbox_to_wd:nn { #3 } { \hfil #4 \hfil } }
+-      }
+-  }
+ \cs_new:Npn \__xdu_en_month:n #1
+   {
+     \str_case:Vn #1
+@@ -1915,474 +1956,276 @@
+         \clist_item:Nn \l__xdu_submit_date_clist { 1 }
+       }
+   }
+-\cs_new:Npn \__xdu_cover_author_info:
++% Word positions are in physical PostScript points, relative to the A4 sheet.
++% The baseline of the first line in each block is the reference position.
++\cs_new_protected:Npn \__xdu_form_block:nnnn #1#2#3#4
++  {
++    \put (#1,-#2)
++      { \parbox [t] {#3bp} { \dim_zero:N \parskip #4 \par } }
++  }
++
++\cs_new_protected:Npn \__xdu_form_page:n #1
++  {
++    \AddToHookNext { shipout/foreground }
++      { \group_begin: \dim_set:Nn \unitlength { 1bp } #1 \group_end: }
++    \null
++    \cleardoublepage
++  }
++
++\cs_new_protected:Npn \__xdu_cover_field:nn #1#2
+   {
+-    \rmfamily \zihao { 4 }
+-    \dim_new:N \l__xdu_cover_author_info_dim
+-    \dim_set:Nn \l__xdu_cover_author_info_dim { 7em }
+-    \__xdu_str_max_dim:Nn \l__xdu_cover_author_info_dim { \l__xdu_author_str }
+-    \bool_if:NTF \l__xdu_pro
+-      {
+-        \__xdu_str_max_dim:Nn \l__xdu_cover_author_info_dim
+-          { \l__xdu_supv_str \enskip \l__xdu_supv_t_str }
+-        \str_if_empty:NF \l__xdu_supv_ii_str
+-          {
+-            \__xdu_str_max_dim:Nn \l__xdu_cover_author_info_dim
+-              { \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str }
+-          }
+-        \__xdu_str_max_dim:Nn \l__xdu_cover_author_info_dim
+-          { \l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str }
+-      }
+-      {
+-        \__xdu_str_max_dim:Nn \l__xdu_cover_author_info_dim
+-          { \l__xdu_supv_str \enskip \l__xdu_supv_t_str }
+-        \str_if_empty:NF \l__xdu_supv_ii_str
+-          {
+-            \__xdu_str_max_dim:Nn \l__xdu_cover_author_info_dim
+-              { \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str }
+-          }
+-      }
+-    \__xdu_str_max_dim:Nn \l__xdu_cover_author_info_dim { \l__xdu_degree_str }
+-    \dim_add:Nn \l__xdu_cover_author_info_dim { 3em }
+-    \__xdu_cover_ii:nnnn { 4em } { ^^^^4f5c^^^^8005^^^^59d3^^^^540d }
+-      { \l__xdu_cover_author_info_dim }
+-      { \l__xdu_author_str }
+-    \bool_if:NTF \l__xdu_pro
+-      {
+-        \__xdu_cover_ii:nnnn { 9em } { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 }
+-          { \l__xdu_cover_author_info_dim }
+-          { \l__xdu_supv_str \enskip \l__xdu_supv_t_str }
+-        \str_if_empty:NF \l__xdu_supv_ii_str
+-          {
+-            \__xdu_cover_ii:nnnn { 9em } { }
+-              { \l__xdu_cover_author_info_dim }
+-              { \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str }
+-          }
+-        \__xdu_cover_ii:nnnn { 9em } { ^^^^4f01^^^^4e1a^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 }
+-          { \l__xdu_cover_author_info_dim }
+-          { \l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str }
+-      }
+-      {
+-        \__xdu_cover_ii:nnnn { 9em } { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 }
+-          { \l__xdu_cover_author_info_dim }
+-          { \l__xdu_supv_str \enskip \l__xdu_supv_t_str }
+-        \str_if_empty:NF \l__xdu_supv_ii_str
+-          {
+-            \__xdu_cover_ii:nnnn { 9em } { }
+-              { \l__xdu_cover_author_info_dim }
+-              { \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str }
++    { \CJKfamily { \CJKsfdefault } #1 }
++    \enskip
++    \__xdu_uline:n { #2 \rule[-2bp]{0pt}{0pt} \hspace{2em} }
++    \par
++  }
++
++\cs_new_protected:Npn \__xdu_cover:
++  {
++    \__xdu_form_page:n
++      {
++        \__xdu_form_block:nnnn { 99.2 } { \bool_if:NTF \l__xdu_pro { 520.2 } { 548.5 } } { 425.2 }
++          { \centering \rmfamily \bfseries \zihao { 2 } \dim_set:Nn \baselineskip { 30bp }
++            \l__xdu_title_tl }
++        \__xdu_form_block:nnnn { 170.1 } { \bool_if:NTF \l__xdu_pro { 633.6 } { 676.1 } } { 300 }
++          {
++            \rmfamily \bfseries \zihao { 4 } \dim_set:Nn \baselineskip { 30bp }
++            \__xdu_cover_field:nn { ^^^^4f5c^^^^8005^^^^59d3^^^^540d } { \l__xdu_author_str }
++            \__xdu_cover_field:nn
++              { \bool_if:NTF \l__xdu_pro { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 } { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 } }
++              { \l__xdu_supv_str \enskip \l__xdu_supv_t_str }
++            \str_if_empty:NF \l__xdu_supv_ii_str
++              {
++                \par\hspace{9em}\enskip
++                \__xdu_uline:n { \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str \hspace{2em} }
++                \par
++              }
++            \tl_if_empty:NF \l__xdu_supv_ent_str
++              { \__xdu_cover_field:nn { ^^^^4f01^^^^4e1a^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0 }
++                  { \l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str } }
++            \__xdu_cover_field:nn { ^^^^7533^^^^8bf7^^^^5b66^^^^4f4d^^^^7c7b^^^^522b } { \l__xdu_degree_str }
+           }
+       }
+-    \__xdu_cover_ii:nnnn { 6em } { ^^^^7533^^^^8bf7^^^^5b66^^^^4f4d^^^^7c7b^^^^522b }
+-      { \l__xdu_cover_author_info_dim }
+-      { \l__xdu_degree_str }
+   }
+-\cs_new:Npn \__xdu_zh_title_page_info:
++
++\cs_new_protected:Npn \__xdu_title_id:nn #1#2
+   {
+-    \rmfamily \zihao { 4 }
+-    \dim_new:N \l__xdu_zh_title_page_info_dim
+-    \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-      { ^^^^4f5c^^^^8005^^^^59d3^^^^540d^^^^ff1a\l__xdu_author_str }
+-    \bool_if:NTF \l__xdu_ac
+-      {
+-        \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-          { ^^^^4e00^^^^7ea7^^^^5b66^^^^79d1^^^^ff1a\l__xdu_major_str }
+-        \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-          { ^^^^4e8c^^^^7ea7^^^^5b66^^^^79d1^^^^ff08^^^^7814^^^^7a76^^^^65b9^^^^5411^^^^ff09^^^^ff1a\l__xdu_sub_major_str }
+-      }
+-      {
+-        \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-          { ^^^^9886\qquad{}^^^^57df^^^^ff1a\l__xdu_domain_str }
+-      }
+-      \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-        { ^^^^5b66^^^^4f4d^^^^7c7b^^^^522b^^^^ff1a\l__xdu_degree_str }
+-    \bool_if:NTF \l__xdu_pro
++    \makebox [52bp] [l] { #1 }
++    \__xdu_uline:n { \makebox [69bp] [c] { #2 } }
++    \par
++  }
++
++\cs_new_protected:Npn \__xdu_zh_title_page:
++  {
++    \__xdu_form_page:n
+       {
+-        \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-          { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a\l__xdu_supv_str \enskip \l__xdu_supv_t_str }
+-        \str_if_empty:NF \l__xdu_supv_ii_str
++        \__xdu_form_block:nnnn
++          { \bool_if:NTF \l__xdu_pro { 76.6 } { 90.7 } }
++          { \bool_if:NTF \l__xdu_pro { 93.8 } { 97.3 } } { 128 }
+           {
+-            \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-              { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a\l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str }
++            \rmfamily \bfseries \zihao { 5 } \dim_set:Nn \baselineskip { 18.3bp }
++            \__xdu_title_id:nn { ^^^^5b66^^^^6821^^^^4ee3^^^^7801 } { 10701 }
++            \__xdu_title_id:nn { ^^^^5206^^^^7c7b^^^^53f7 } { \l__xdu_clc_str }
+           }
+-        \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-          { ^^^^4f01^^^^4e1a^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a\l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str }
+-      }
+-      {
+-        \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-          { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a\l__xdu_supv_str \enskip \l__xdu_supv_t_str }
+-        \str_if_empty:NF \l__xdu_supv_ii_str
++        \__xdu_form_block:nnnn
++          { \bool_if:NTF \l__xdu_pro { 379.9 } { 394.1 } }
++          { \bool_if:NTF \l__xdu_pro { 93.8 } { 97.3 } } { 128 }
+           {
+-            \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-              { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a\l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str }
++            \rmfamily \bfseries \zihao { 5 } \dim_set:Nn \baselineskip { 18.3bp }
++            \__xdu_title_id:nn { ^^^^5b66\enskip ^^^^53f7 } { \l__xdu_student_id_str }
++            \__xdu_title_id:nn { ^^^^5bc6\enskip ^^^^7ea7 } { \l__xdu_secret_lv_str }
+           }
+-      }
+-    \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-      { ^^^^5b66\qquad{}^^^^9662^^^^ff1a\l__xdu_dept_str }
+-    \__xdu_str_max_dim:Nn \l__xdu_zh_title_page_info_dim
+-      { ^^^^63d0^^^^4ea4^^^^65e5^^^^671f^^^^ff1a\__xdu_zh_submit_date: }
+-    \dim_new:N \l__xdu_zh_title_page_info_skip_dim
+-    \dim_set_eq:NN \l__xdu_zh_title_page_info_skip_dim \linewidth
+-    \dim_sub:Nn \l__xdu_zh_title_page_info_skip_dim { \l__xdu_zh_title_page_info_dim }
+-    \skip_horizontal:n { \dim_eval:n { \l__xdu_zh_title_page_info_skip_dim / 2 } }
+-    \vbox:n
+-      {
+-        \rmfamily \zihao { 4 }
+-        \dim_set:Nn \baselineskip { 32pt }
+-        { \bfseries ^^^^4f5c^^^^8005^^^^59d3^^^^540d^^^^ff1a } \l__xdu_author_str
+-        \bool_if:NTF \l__xdu_ac
++        \__xdu_form_block:nnnn { \bool_if:NTF \l__xdu_pro { 70.9 } { 85 } }
++          { \bool_if:NTF \l__xdu_pro { 211 } { 214.1 } } { 439.4 }
+           {
+-            \par
+-            { \bfseries ^^^^4e00^^^^7ea7^^^^5b66^^^^79d1^^^^ff1a } \l__xdu_major_str
+-            \par
+-            { \bfseries ^^^^4e8c^^^^7ea7^^^^5b66^^^^79d1^^^^ff08^^^^7814^^^^7a76^^^^65b9^^^^5411^^^^ff09^^^^ff1a } \l__xdu_sub_major_str
++            \centering \rmfamily \CJKfamily { \CJKsfdefault } \zihao { 1 } \bfseries
++            ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66
+           }
++        \__xdu_form_block:nnnn { \bool_if:NTF \l__xdu_pro { 70.9 } { 85 } }
++          { \bool_if:NTF \l__xdu_pro { 301 } { 304.1 } } { 439.4 }
++          { \centering \rmfamily \zihao { -1 } \bfseries \l__xdu_gr_type_tl ^^^^5b66^^^^4f4d^^^^8bba^^^^6587 }
++        \__xdu_form_block:nnnn { \bool_if:NTF \l__xdu_pro { 70.9 } { 85 } }
++          { \bool_if:NTF \l__xdu_pro { 408.8 } { 412.6 } } { 439.4 }
+           {
+-            \par
+-            { \bfseries ^^^^9886\qquad{}^^^^57df^^^^ff1a } \l__xdu_domain_str
++            \centering \rmfamily \zihao { 2 } \bfseries
++            \dim_set:Nn \baselineskip { 30bp } \l__xdu_title_tl
+           }
+-        \par
+-        { \bfseries ^^^^5b66^^^^4f4d^^^^7c7b^^^^522b^^^^ff1a } \l__xdu_degree_str
+-        \bool_if:NTF \l__xdu_pro
++        \__xdu_form_block:nnnn { \bool_if:NTF \l__xdu_pro { 198.4 } { 212.6 } }
++          { \bool_if:NTF \l__xdu_pro { 552.2 } { 555.9 } } { 297.6 }
+           {
+-            \par
+-            { \bfseries ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a }
+-            \l__xdu_supv_str \enskip \l__xdu_supv_t_str
+-            \str_if_empty:NF \l__xdu_supv_ii_str
++            \rmfamily \zihao { 4 } \dim_set:Nn \baselineskip { 32bp }
++            { \bfseries ^^^^4f5c^^^^8005^^^^59d3^^^^540d^^^^ff1a } \l__xdu_author_str \par
++            \bool_if:NTF \l__xdu_ac
+               {
+-                \par
+-                \phantom { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a }
+-                \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str
++                { \bfseries ^^^^4e00^^^^7ea7^^^^5b66^^^^79d1^^^^ff1a } \l__xdu_major_str \par
++                { \bfseries ^^^^4e8c^^^^7ea7^^^^5b66^^^^79d1^^^^ff08^^^^7814^^^^7a76^^^^65b9^^^^5411^^^^ff09^^^^ff1a } \l__xdu_sub_major_str \par
+               }
+-            \par
+-            { \bfseries ^^^^4f01^^^^4e1a^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a }
+-            \l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str
+-          }
+-          {
+-            \par
+-            { \bfseries ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a }
+-            \l__xdu_supv_str \enskip \l__xdu_supv_t_str
++              { { \bfseries ^^^^9886\qquad ^^^^57df^^^^ff1a } \l__xdu_domain_str \par }
++            { \bfseries ^^^^5b66^^^^4f4d^^^^7c7b^^^^522b^^^^ff1a } \l__xdu_degree_str \par
++            { \bfseries \bool_if:NTF \l__xdu_pro
++                { ^^^^5b66^^^^6821^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a } { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a } }
++            \l__xdu_supv_str \enskip \l__xdu_supv_t_str \par
+             \str_if_empty:NF \l__xdu_supv_ii_str
+-              {
+-                \par
+-                \phantom { ^^^^6307^^^^5bfc^^^^6559^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a }
+-                \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str
+-              }
++              { \hspace{9em} \l__xdu_supv_ii_str \enskip \l__xdu_supv_ii_t_str \par }
++            \tl_if_empty:NF \l__xdu_supv_ent_str
++              { { \bfseries ^^^^4f01^^^^4e1a^^^^5bfc^^^^5e08^^^^59d3^^^^540d^^^^3001^^^^804c^^^^79f0^^^^ff1a }
++                \l__xdu_supv_ent_str \enskip \l__xdu_supv_ent_t_str \par }
++            { \bfseries ^^^^5b66\qquad ^^^^9662^^^^ff1a } \l__xdu_dept_str \par
++            { \bfseries ^^^^63d0^^^^4ea4^^^^65e5^^^^671f^^^^ff1a } \__xdu_zh_submit_date:
+           }
+-        \par
+-        { \bfseries ^^^^5b66\qquad{}^^^^9662^^^^ff1a } \l__xdu_dept_str
+-        \par
+-        { \bfseries ^^^^63d0^^^^4ea4^^^^65e5^^^^671f^^^^ff1a } \__xdu_zh_submit_date:
+-      }
+-  }
+-\cs_new:Npn \__xdu_zh_title_page:
+-  {
+-    \vbox:n { }
+-    \skip_vertical:n { -7.5pt }
+-    \dim_set:Nn \baselineskip { 15.6bp }
+-    \vbox:n
+-      {
+-        \mode_leave_vertical:
+-        \__xdu_cover_iii:nnnn { 4em } { ^^^^5b66^^^^6821^^^^4ee3^^^^7801 } { 7em } { 10701                }
+-        \hfill
+-        \__xdu_cover_iii:nnnn { 3em } { ^^^^5b66^^^^53f7     } { 7em } { \l__xdu_student_id_str }
+-      }
+-    \vbox:n
+-      {
+-        \mode_leave_vertical:
+-        \__xdu_cover_iii:nnnn { 4em } { ^^^^5206^^^^7c7b^^^^53f7   } { 7em } { \l__xdu_clc_str        }
+-        \hfill
+-        \__xdu_cover_iii:nnnn { 3em } { ^^^^5bc6^^^^7ea7     } { 7em } { \l__xdu_secret_lv_str  }
+-      }
+-    \__xdu_cover_i:nnnnn { 100pt  } { sf } { 1  } { bf } { ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66   }
+-    \__xdu_cover_i:nnnnn { 85pt   } { rm } { -1 } { bf } { \l__xdu_gr_type_tl ^^^^5b66^^^^4f4d^^^^8bba^^^^6587 }
+-    \skip_vertical:n { 87.5pt }
+-    \vbox_to_ht:nn { 150pt }
+-      {
+-        \rmfamily \zihao { 2 } \bfseries \__xdu_bold_math: \centering
+-        \dim_set:Nn \baselineskip { 30pt }
+-        \l__xdu_title_tl
+       }
+-    \group_begin:
+-      \__xdu_zh_title_page_info:
+-    \group_end:
+-    \cleardoublepage
+   }
+-\dim_new:N \l__xdu_supv_dim
+-\dim_new:N \l__xdu_supv_max_dim
+-\box_new:N \l__xdu_supv_box
+-\cs_new:Npn \__xdu_en_title_supv:n #1
+-  {
+-    \rmfamily \zihao { 3 }
+-    \dim_zero:N \l__xdu_supv_max_dim
+-    \hbox_set:Nn \l__xdu_supv_box { \l__xdu_supv_en_str }
+-    \dim_set:Nn \l__xdu_supv_dim { \box_wd:N \l__xdu_supv_box }
+-    \dim_set:Nn \l__xdu_supv_max_dim
+-      { \dim_max:nn { \l__xdu_supv_dim } { \l__xdu_supv_max_dim } }
+-    \str_if_empty:NF \l__xdu_supv_ii_str
+-      {
+-        \hbox_set:Nn \l__xdu_supv_box { \l__xdu_supv_ii_en_str }
+-        \dim_set:Nn \l__xdu_supv_dim { \box_wd:N \l__xdu_supv_box }
+-        \dim_set:Nn \l__xdu_supv_max_dim
+-          { \dim_max:nn { \l__xdu_supv_dim } { \l__xdu_supv_max_dim } }
+-      }
+-    \bool_if:NT \l__xdu_pro
+-      {
+-        \hbox_set:Nn \l__xdu_supv_box { \l__xdu_supv_ent_en_str }
+-        \dim_set:Nn \l__xdu_supv_dim { \box_wd:N \l__xdu_supv_box }
+-        \dim_set:Nn \l__xdu_supv_max_dim
+-          { \dim_max:nn { \l__xdu_supv_dim } { \l__xdu_supv_max_dim } }
+-      }
+-    \hbox_to_wd:nn { \l__xdu_supv_max_dim } { #1 \hfil } \quad
+-  }
+-\dim_new:N \l__xdu_supv_t_dim
+-\dim_new:N \l__xdu_supv_t_max_dim
+-\box_new:N \l__xdu_supv_t_box
+-\cs_new:Npn \__xdu_en_title_supv_t:n #1
+-  {
+-    \rmfamily \zihao { 3 }
+-    \dim_zero:N \l__xdu_supv_t_max_dim
+-    \hbox_set:Nn \l__xdu_supv_t_box { \l__xdu_supv_t_en_str }
+-    \dim_set:Nn \l__xdu_supv_t_dim { \box_wd:N \l__xdu_supv_t_box }
+-    \dim_set:Nn \l__xdu_supv_t_max_dim
+-      { \dim_max:nn { \l__xdu_supv_t_dim } { \l__xdu_supv_t_max_dim } }
+-    \str_if_empty:NF \l__xdu_supv_ii_str
+-      {
+-        \hbox_set:Nn \l__xdu_supv_t_box { \l__xdu_supv_ii_t_en_str }
+-        \dim_set:Nn \l__xdu_supv_t_dim { \box_wd:N \l__xdu_supv_t_box }
+-        \dim_set:Nn \l__xdu_supv_t_max_dim
+-          { \dim_max:nn { \l__xdu_supv_t_dim } { \l__xdu_supv_t_max_dim } }
+-      }
+-    \bool_if:NT \l__xdu_pro
+-      {
+-        \hbox_set:Nn \l__xdu_supv_t_box { \l__xdu_supv_ent_t_en_str }
+-        \dim_set:Nn \l__xdu_supv_t_dim { \box_wd:N \l__xdu_supv_t_box }
+-        \dim_set:Nn \l__xdu_supv_t_max_dim
+-          { \dim_max:nn { \l__xdu_supv_t_dim } { \l__xdu_supv_t_max_dim } }
+-      }
+-    \hbox_to_wd:nn { \l__xdu_supv_t_max_dim } { #1 \hfil } \quad
+-  }
+-\cs_new:Npn \__xdu_en_title_page:
+-  {
+-    \vbox:n { }
+-    \skip_vertical:n { -3.5pt }
+-    \dim_set:Nn \baselineskip { 30pt }
+-    \vbox_to_ht:nn { 170pt }
+-      {
+-        \rmfamily \zihao { 2 } \bfseries \__xdu_bold_math: \centering
+-        \dim_set:Nn \baselineskip { 30pt }
+-        \l__xdu_title_en_str
+-      }
+-    \vbox_to_ht:nn { 360pt }
+-      {
+-        \rmfamily \zihao { 3 } \centering
+-        \dim_set:Nn \baselineskip { 30pt }
+-        A
+-        \bool_if:NTF \l__xdu_master { ~thesis~ } { ~dissertation~ }
+-        submitted~to\\
+-        XIDIAN~UNIVERSITY\\
+-        in~partial~fulfillment~of~the~requirements\\
+-        for~the~degree~of
+-        \bool_if:NTF \l__xdu_master { ~Master\\ } { ~Doctor~of~Philosophy\\ }
+-        in
+-        \bool_if:NTF \l__xdu_pro
+-          { ~\l__xdu_degree_en_str\\ }
+-          { ~\l__xdu_major_en_str\\  }
+-      }
+-    \vbox:n
+-      {
+-        \rmfamily \zihao { 3 } \centering
+-        \dim_set:Nn \baselineskip { 30pt }
+-        By\\
+-        \l__xdu_author_en_str
+-        \str_if_empty:NTF \l__xdu_author_en_str
+-          { \skip_vertical:N \baselineskip }
+-          { \\ }
+-        Supervisor:~\__xdu_en_title_supv:n { \l__xdu_supv_en_str }
+-        Title:~\__xdu_en_title_supv_t:n { \l__xdu_supv_t_en_str } \\
+-        \str_if_empty:NF \l__xdu_supv_ii_str
+-          {
+-            \phantom { Supervisor:~ } \__xdu_en_title_supv:n { \l__xdu_supv_ii_en_str }
+-            \phantom { Title:~ } \__xdu_en_title_supv_t:n { \l__xdu_supv_ii_t_en_str } \\
++
++\cs_new_protected:Npn \__xdu_en_title_page:
++  {
++    \__xdu_form_page:n
++      {
++        \__xdu_form_block:nnnn { 77.9 } { 100.6 } { 439.4 }
++          {
++            \centering \rmfamily \zihao { 2 } \bfseries
++            \dim_set:Nn \baselineskip { 30bp } \l__xdu_title_en_str
++          }
++        \__xdu_form_block:nnnn { 77.9 } { 270.5 } { 439.4 }
++          {
++            \centering \rmfamily \zihao { 3 } \dim_set:Nn \baselineskip { 30bp }
++            A~\bool_if:NTF \l__xdu_master { thesis } { dissertation }~submitted~to\par
++            XIDIAN~UNIVERSITY\par
++            in~partial~fulfillment~of~the~requirements\par
++            for~the~degree~of~\bool_if:NTF \l__xdu_master { Master } { Doctor~of~Philosophy }\par
++            in~\bool_if:NTF \l__xdu_pro { \l__xdu_degree_en_str } { \l__xdu_major_en_str }
+           }
+-        \bool_if:NT \l__xdu_pro
++        \__xdu_form_block:nnnn { 62.65 } { \bool_if:NTF \l__xdu_pro { 611 } { 631 } } { 470 }
+           {
+-            Supervisor:~ \__xdu_en_title_supv:n { \l__xdu_supv_ent_en_str }
+-            Title:~ \__xdu_en_title_supv_t:n { \l__xdu_supv_ent_t_en_str } \\
++            \centering \rmfamily \zihao { 3 } \dim_set:Nn \baselineskip { 30bp }
++            By\par
++            \strut \l__xdu_author_en_str \par
++            Supervisor:~\l__xdu_supv_en_str \qquad Title:~\l__xdu_supv_t_en_str \par
++            \str_if_empty:NF \l__xdu_supv_ii_en_str
++              { Supervisor:~\l__xdu_supv_ii_en_str \qquad Title:~\l__xdu_supv_ii_t_en_str \par }
++            \tl_if_empty:NF \l__xdu_supv_ent_en_str
++              { Supervisor:~\l__xdu_supv_ent_en_str \qquad Title:~\l__xdu_supv_ent_t_en_str \par }
++            \__xdu_en_submit_date:
+           }
+-        \__xdu_en_submit_date:
+       }
+-    \cleardoublepage
+   }
+-\cs_new:Npn \__xdu_statement_scan_sign_uline:n #1
++\cs_new_protected:Npn \__xdu_statement_scan_sign_uline:n #1
+   {
+     \__xdu_uline:n
+       {
+-        \vbox_to_ht:nn { 17.5pt }
++        \makebox [7em] [c]
+           {
+-            \vfil
+-            \hbox_to_wd:nn { 10em }
++            \tl_if_blank:eF { #1 }
+               {
+-                \hfil
+-                \includegraphics [ width = 10em, height = 25pt, keepaspectratio ] { #1 }
+-                \hfil
++                \raisebox { 0pt } [0pt] [0pt]
++                  { \includegraphics [width=7em,height=17bp,keepaspectratio] { #1 } }
+               }
+           }
+       }
+   }
+-\cs_new:Npn \__xdu_statement_scan_sign:nnnn #1#2#3#4
++\cs_new_protected:Npn \__xdu_statement_scan_sign:nnnn #1#2#3#4
++  {
++    #1^^^^ff1a\__xdu_statement_scan_sign_uline:n { #2 }
++    \qquad
++    #3^^^^ff1a\__xdu_statement_scan_sign_uline:n { #4 }
++  }
++\cs_new_protected:Npn \__xdu_statement:
+   {
+-    \vbox_to_ht:nn { 30pt }
++    \__xdu_form_page:n
+       {
+-        \vfil
+-        #1^^^^ff1a
+-        \__xdu_statement_scan_sign_uline:n { #2 }
+-        \hfill
+-        #3^^^^ff1a
+-        \__xdu_statement_scan_sign_uline:n { #4 }
+-      }
+-  }
+-\cs_new:Npn \__xdu_statement:
+-  {
+-    \vbox:n { }
+-    \skip_vertical:n { -8.5pt }
+-    \vbox_to_ht:nn { 59.5pt }
+-      {
+-        \rmfamily \zihao { 4 } \bfseries \centering
+-        \dim_set:Nn \baselineskip { 20pt }
+-        ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66\\
+-        ^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^72ec^^^^521b^^^^6027^^^^ff08^^^^6216^^^^521b^^^^65b0^^^^6027^^^^ff09^^^^58f0^^^^660e
+-      }
+-    \vbox_to_ht:nn { 120pt }
+-      {
+-        \rmfamily \zihao { -4 }
+-        \xeCJKsetup { CJKglue = { \hskip 0pt } }
+-        \dim_set:Nn \parindent { 2em }
+-        \dim_set:Nn \baselineskip { 20pt }
+-        ^^^^79c9^^^^627f^^^^5b66^^^^6821^^^^4e25^^^^8c28^^^^7684^^^^5b66^^^^98ce^^^^548c^^^^4f18^^^^826f^^^^7684^^^^79d1^^^^5b66^^^^9053^^^^5fb7^^^^ff0c^^^^672c^^^^4eba^^^^58f0^^^^660e^^^^6240^^^^5448^^^^4ea4^^^^7684^^^^8bba^^^^6587^^^^662f^^^^6211^^^^4e2a^^^^4eba^^^^5728^^^^5bfc^^^^5e08^^^^6307
+-        ^^^^5bfc^^^^4e0b^^^^8fdb^^^^884c^^^^7684^^^^7814^^^^7a76^^^^5de5^^^^4f5c^^^^53ca^^^^53d6^^^^5f97^^^^7684^^^^7814^^^^7a76^^^^6210^^^^679c^^^^3002^^^^5c3d^^^^6211^^^^6240^^^^77e5^^^^ff0c^^^^9664^^^^4e86^^^^6587^^^^4e2d^^^^7279^^^^522b^^^^52a0^^^^4ee5^^^^6807^^^^6ce8^^^^548c^^^^81f4^^^^8c22
+-        ^^^^4e2d^^^^6240^^^^7f57^^^^5217^^^^7684^^^^5185^^^^5bb9^^^^4ee5^^^^5916^^^^ff0c^^^^8bba^^^^6587^^^^4e2d^^^^4e0d^^^^5305^^^^542b^^^^5176^^^^4ed6^^^^4eba^^^^5df2^^^^7ecf^^^^53d1^^^^8868^^^^6216^^^^64b0^^^^5199^^^^8fc7^^^^7684^^^^7814^^^^7a76^^^^6210^^^^679c^^^^ff1b^^^^4e5f^^^^4e0d^^^^5305
+-        ^^^^542b^^^^4e3a^^^^83b7^^^^5f97^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^6216^^^^5176^^^^5b83^^^^6559^^^^80b2^^^^673a^^^^6784^^^^7684^^^^5b66^^^^4f4d^^^^6216^^^^8bc1^^^^4e66^^^^800c^^^^4f7f^^^^7528^^^^8fc7^^^^7684^^^^6750^^^^6599^^^^3002^^^^4e0e^^^^6211^^^^4e00
+-        ^^^^540c^^^^5de5^^^^4f5c^^^^7684^^^^540c^^^^4e8b^^^^5bf9^^^^672c^^^^7814^^^^7a76^^^^6240^^^^505a^^^^7684^^^^4efb^^^^4f55^^^^8d21^^^^732e^^^^5747^^^^5df2^^^^5728^^^^8bba^^^^6587^^^^4e2d^^^^4f5c^^^^4e86^^^^660e^^^^786e^^^^7684^^^^8bf4^^^^660e^^^^5e76^^^^8868^^^^793a^^^^4e86^^^^8c22^^^^610f^^^^3002
+-        \par
+-        ^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^82e5^^^^6709^^^^4e0d^^^^5b9e^^^^4e4b^^^^5904^^^^ff0c^^^^672c^^^^4eba^^^^627f^^^^62c5^^^^4e00^^^^5207^^^^6cd5^^^^5f8b^^^^8d23^^^^4efb^^^^3002
+-        \vfil
+-      }
+-    \clist_if_empty:NT \l__xdu_statement_sign_clist
+-      { \skip_vertical:n { 20pt } }
+-    \vbox_to_ht:nn { 155pt }
+-      {
+-        \rmfamily \zihao { -4 }
+-        \dim_set:Nn \parindent { 2em }
+-        \dim_set:Nn \baselineskip { 20pt }
+-        \clist_if_empty:NTF \l__xdu_statement_sign_clist
+-          {
+-            ^^^^672c^^^^4eba^^^^7b7e^^^^540d^^^^ff1a\__xdu_uline:n { \skip_horizontal:n { 10em } }
+-            \hfill
+-            ^^^^65e5\qquad{}^^^^671f^^^^ff1a\__xdu_uline:n { \skip_horizontal:n { 10em } }
++        \__xdu_form_block:nnnn { 85 } { 92.7 } { 439.4 }
++          {
++            \centering \rmfamily \zihao { 4 } \bfseries \dim_set:Nn \baselineskip { 20bp }
++            ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66\par
++            ^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^72ec^^^^521b^^^^6027^^^^ff08^^^^6216^^^^521b^^^^65b0^^^^6027^^^^ff09^^^^58f0^^^^660e
+           }
++        \__xdu_form_block:nnnn { 85 } { 152.7 } { 439.4 }
+           {
++            \rmfamily \zihao { -4 } \dim_set:Nn \parindent { 2em }
++            \dim_set:Nn \baselineskip { 20bp }
++            ^^^^79c9^^^^627f^^^^5b66^^^^6821^^^^4e25^^^^8c28^^^^7684^^^^5b66^^^^98ce^^^^548c^^^^4f18^^^^826f^^^^7684^^^^79d1^^^^5b66^^^^9053^^^^5fb7^^^^ff0c^^^^672c^^^^4eba^^^^58f0^^^^660e^^^^6240^^^^5448^^^^4ea4^^^^7684^^^^8bba^^^^6587^^^^662f^^^^6211^^^^4e2a^^^^4eba^^^^5728^^^^5bfc^^^^5e08^^^^6307^^^^5bfc^^^^4e0b^^^^8fdb^^^^884c^^^^7684^^^^7814^^^^7a76^^^^5de5^^^^4f5c^^^^53ca^^^^53d6^^^^5f97^^^^7684^^^^7814^^^^7a76^^^^6210^^^^679c^^^^3002^^^^5c3d^^^^6211^^^^6240^^^^77e5^^^^ff0c^^^^9664^^^^4e86^^^^6587^^^^4e2d^^^^7279^^^^522b^^^^52a0^^^^4ee5^^^^6807^^^^6ce8^^^^548c^^^^81f4^^^^8c22^^^^4e2d^^^^6240^^^^7f57^^^^5217^^^^7684^^^^5185^^^^5bb9^^^^4ee5^^^^5916^^^^ff0c^^^^8bba^^^^6587^^^^4e2d^^^^4e0d^^^^5305^^^^542b^^^^5176^^^^4ed6^^^^4eba^^^^5df2^^^^7ecf^^^^53d1^^^^8868^^^^6216^^^^64b0^^^^5199^^^^8fc7^^^^7684^^^^7814^^^^7a76^^^^6210^^^^679c^^^^ff1b^^^^4e5f^^^^4e0d^^^^5305^^^^542b^^^^4e3a^^^^83b7^^^^5f97^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^6216^^^^5176^^^^5b83^^^^6559^^^^80b2^^^^673a^^^^6784^^^^7684^^^^5b66^^^^4f4d^^^^6216^^^^8bc1^^^^4e66^^^^800c^^^^4f7f^^^^7528^^^^8fc7^^^^7684^^^^6750^^^^6599^^^^3002^^^^4e0e^^^^6211^^^^4e00^^^^540c^^^^5de5^^^^4f5c^^^^7684^^^^540c^^^^4e8b^^^^5bf9^^^^672c^^^^7814^^^^7a76^^^^6240^^^^505a^^^^7684^^^^4efb^^^^4f55^^^^8d21^^^^732e^^^^5747^^^^5df2^^^^5728^^^^8bba^^^^6587^^^^4e2d^^^^4f5c^^^^4e86^^^^660e^^^^786e^^^^7684^^^^8bf4^^^^660e^^^^5e76^^^^8868^^^^793a^^^^4e86^^^^8c22^^^^610f^^^^3002
++            \par
++            ^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^82e5^^^^6709^^^^4e0d^^^^5b9e^^^^4e4b^^^^5904^^^^ff0c^^^^672c^^^^4eba^^^^627f^^^^62c5^^^^4e00^^^^5207^^^^6cd5^^^^5f8b^^^^8d23^^^^4efb^^^^3002
++          }
++        \__xdu_form_block:nnnn { 85 } { 292.7 } { 365 }
++          {
++            \rmfamily \zihao { -4 } \hspace{2em}
+             \__xdu_statement_scan_sign:nnnn
+-              { ^^^^672c^^^^4eba^^^^7b7e^^^^540d     } { \clist_item:Nn \l__xdu_statement_sign_clist { 1 } }
+-              { ^^^^65e5\qquad{}^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 2 } }
++              { ^^^^672c^^^^4eba^^^^7b7e^^^^540d } { \clist_item:Nn \l__xdu_statement_sign_clist { 1 } }
++              { ^^^^65e5\qquad ^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 2 } }
+           }
+-      }
+-    \clist_if_empty:NF \l__xdu_statement_sign_clist
+-      { \skip_vertical:n { 20pt } }
+-    \vbox_to_ht:nn { 60pt }
+-      {
+-        \rmfamily \zihao { 4 } \bfseries \centering
+-        \dim_set:Nn \baselineskip { 20pt }
+-        ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66\\
+-        ^^^^5173^^^^4e8e^^^^8bba^^^^6587^^^^4f7f^^^^7528^^^^6388^^^^6743^^^^7684^^^^8bf4^^^^660e
+-      }
+-    \vbox_to_ht:nn { 160pt }
+-      {
+-        \rmfamily \zihao { -4 }
+-        \xeCJKsetup { CJKglue = { \hskip 0pt } }
+-        \dim_set:Nn \parindent { 2em }
+-        \dim_set:Nn \baselineskip { 20pt }
+-        ^^^^672c^^^^4eba^^^^5b8c^^^^5168^^^^4e86^^^^89e3^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^6709^^^^5173^^^^4fdd^^^^7559^^^^548c^^^^4f7f^^^^7528^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^89c4^^^^5b9a^^^^ff0c^^^^5373^^^^ff1a^^^^7814^^^^7a76^^^^751f^^^^5728^^^^6821
+-        ^^^^653b^^^^8bfb^^^^5b66^^^^4f4d^^^^671f^^^^95f4^^^^8bba^^^^6587^^^^5de5^^^^4f5c^^^^7684^^^^77e5^^^^8bc6^^^^4ea7^^^^6743^^^^5c5e^^^^4e8e^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^3002^^^^5b66^^^^6821^^^^6709^^^^6743^^^^4fdd^^^^7559^^^^5e76^^^^5411^^^^56fd^^^^5bb6
+-        ^^^^6709^^^^5173^^^^90e8^^^^95e8^^^^6216^^^^673a^^^^6784^^^^9001^^^^4ea4^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^590d^^^^5370^^^^4ef6^^^^548c^^^^7535^^^^5b50^^^^7248^^^^ff0c^^^^4ee5^^^^5b66^^^^672f^^^^4ea4^^^^6d41^^^^4e3a^^^^76ee^^^^7684^^^^8d60^^^^9001^^^^548c^^^^4ea4^^^^6362^^^^5b66
+-        ^^^^4f4d^^^^8bba^^^^6587^^^^ff0c^^^^5141^^^^8bb8^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^88ab^^^^67e5^^^^9605^^^^3001^^^^501f^^^^9605^^^^548c^^^^590d^^^^5370^^^^ff0c^^^^5c06^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^5168^^^^90e8^^^^6216^^^^90e8^^^^5206^^^^5185^^^^5bb9^^^^7f16^^^^5165^^^^6709
+-        ^^^^5173^^^^6570^^^^636e^^^^5e93^^^^8fdb^^^^884c^^^^68c0^^^^7d22^^^^548c^^^^63d0^^^^4f9b^^^^76f8^^^^5e94^^^^9605^^^^89c8^^^^670d^^^^52a1^^^^ff1b^^^^5141^^^^8bb8^^^^91c7^^^^7528^^^^5f71^^^^5370^^^^3001^^^^7f29^^^^5370^^^^6216^^^^5176^^^^5b83^^^^590d^^^^5236^^^^624b^^^^6bb5^^^^4fdd^^^^5b58
+-        ^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^3002^^^^540c^^^^65f6^^^^672c^^^^4eba^^^^4fdd^^^^8bc1^^^^ff0c^^^^7ed3^^^^5408^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7814^^^^7a76^^^^6210^^^^679c^^^^5b8c^^^^6210^^^^7684^^^^8bba^^^^6587^^^^3001^^^^53d1^^^^660e^^^^4e13^^^^5229^^^^7b49^^^^6210^^^^679c^^^^ff0c
+-        ^^^^7f72^^^^540d^^^^5355^^^^4f4d^^^^4e3a^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^3002
+-        \par
+-        ^^^^672c^^^^4eba^^^^4fdd^^^^8bc1^^^^9075^^^^5b88^^^^4e0a^^^^8ff0^^^^89c4^^^^5b9a^^^^3002
+-        \par
+-        ^^^^ff08^^^^4fdd^^^^5bc6^^^^7684^^^^8bba^^^^6587^^^^5728^^^^89e3^^^^5bc6^^^^540e^^^^9075^^^^5b88^^^^6b64^^^^89c4^^^^5b9a^^^^ff09
+-        \vfil
+-      }
+-    \clist_if_empty:NT \l__xdu_statement_sign_clist
+-      { \skip_vertical:n { 20pt } }
+-    \vbox:n
+-      {
+-        \rmfamily \zihao { -4 }
+-        \dim_set:Nn \parindent { 2em }
+-        \dim_set:Nn \baselineskip { 40pt }
+-        \clist_if_empty:NTF \l__xdu_statement_sign_clist
+-          {
+-            ^^^^672c^^^^4eba^^^^7b7e^^^^540d^^^^ff1a\__xdu_uline:n { \skip_horizontal:n { 10em } }
+-            \hfill
+-            ^^^^5bfc^^^^5e08^^^^7b7e^^^^540d^^^^ff1a\__xdu_uline:n { \skip_horizontal:n { 10em } }
+-            \par
+-            ^^^^65e5\qquad{}^^^^671f^^^^ff1a\__xdu_uline:n { \skip_horizontal:n { 10em } }
+-            \hfill
+-            ^^^^65e5\qquad{}^^^^671f^^^^ff1a\__xdu_uline:n { \skip_horizontal:n { 10em } }
++        \__xdu_form_block:nnnn { 85 } { 452.7 } { 439.4 }
++          {
++            \centering \rmfamily \zihao { 4 } \bfseries \dim_set:Nn \baselineskip { 20bp }
++            ^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66\par
++            ^^^^5173^^^^4e8e^^^^8bba^^^^6587^^^^4f7f^^^^7528^^^^6388^^^^6743^^^^7684^^^^8bf4^^^^660e
++          }
++        \__xdu_form_block:nnnn { 85 } { 512.7 } { 439.4 }
++          {
++            \rmfamily \zihao { -4 } \dim_set:Nn \parindent { 2em }
++            \dim_set:Nn \baselineskip { 20bp }
++            ^^^^672c^^^^4eba^^^^5b8c^^^^5168^^^^4e86^^^^89e3^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^6709^^^^5173^^^^4fdd^^^^7559^^^^548c^^^^4f7f^^^^7528^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^89c4^^^^5b9a^^^^ff0c^^^^5373^^^^ff1a^^^^7814^^^^7a76^^^^751f^^^^5728^^^^6821^^^^653b^^^^8bfb^^^^5b66^^^^4f4d^^^^671f^^^^95f4^^^^8bba^^^^6587^^^^5de5^^^^4f5c^^^^7684^^^^77e5^^^^8bc6^^^^4ea7^^^^6743^^^^5c5e^^^^4e8e^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^3002^^^^5b66^^^^6821^^^^6709^^^^6743^^^^4fdd^^^^7559^^^^5e76^^^^5411^^^^56fd^^^^5bb6^^^^6709^^^^5173^^^^90e8^^^^95e8^^^^6216^^^^673a^^^^6784^^^^9001^^^^4ea4^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^590d^^^^5370^^^^4ef6^^^^548c^^^^7535^^^^5b50^^^^7248^^^^ff0c^^^^4ee5^^^^5b66^^^^672f^^^^4ea4^^^^6d41^^^^4e3a^^^^76ee^^^^7684^^^^8d60^^^^9001^^^^548c^^^^4ea4^^^^6362^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^ff0c^^^^5141^^^^8bb8^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^88ab^^^^67e5^^^^9605^^^^3001^^^^501f^^^^9605^^^^548c^^^^590d^^^^5370^^^^ff0c^^^^5c06^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7684^^^^5168^^^^90e8^^^^6216^^^^90e8^^^^5206^^^^5185^^^^5bb9^^^^7f16^^^^5165^^^^6709^^^^5173^^^^6570^^^^636e^^^^5e93^^^^8fdb^^^^884c^^^^68c0^^^^7d22^^^^548c^^^^63d0^^^^4f9b^^^^76f8^^^^5e94^^^^9605^^^^89c8^^^^670d^^^^52a1^^^^ff1b^^^^5141^^^^8bb8^^^^91c7^^^^7528^^^^5f71^^^^5370^^^^3001^^^^7f29^^^^5370^^^^6216^^^^5176^^^^5b83^^^^590d^^^^5236^^^^624b^^^^6bb5^^^^4fdd^^^^5b58^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^3002^^^^540c^^^^65f6^^^^672c^^^^4eba^^^^4fdd^^^^8bc1^^^^ff0c^^^^7ed3^^^^5408^^^^5b66^^^^4f4d^^^^8bba^^^^6587^^^^7814^^^^7a76^^^^6210^^^^679c^^^^5b8c^^^^6210^^^^7684^^^^8bba^^^^6587^^^^3001^^^^53d1^^^^660e^^^^4e13^^^^5229^^^^7b49^^^^6210^^^^679c^^^^ff0c^^^^7f72^^^^540d^^^^5355^^^^4f4d^^^^4e3a^^^^897f^^^^5b89^^^^7535^^^^5b50^^^^79d1^^^^6280^^^^5927^^^^5b66^^^^3002
++            \par ^^^^672c^^^^4eba^^^^4fdd^^^^8bc1^^^^9075^^^^5b88^^^^4e0a^^^^8ff0^^^^89c4^^^^5b9a^^^^3002
++            \par ^^^^ff08^^^^4fdd^^^^5bc6^^^^7684^^^^8bba^^^^6587^^^^5728^^^^89e3^^^^5bc6^^^^540e^^^^9075^^^^5b88^^^^6b64^^^^89c4^^^^5b9a^^^^ff09
+           }
++        \__xdu_form_block:nnnn { 85 } { 692.7 } { 365 }
+           {
++            \rmfamily \zihao { -4 } \dim_set:Nn \baselineskip { 40bp }
++            \hspace{2em}
+             \__xdu_statement_scan_sign:nnnn
+-              { ^^^^672c^^^^4eba^^^^7b7e^^^^540d     } { \clist_item:Nn \l__xdu_statement_sign_clist { 3 } }
+-              { ^^^^5bfc^^^^5e08^^^^7b7e^^^^540d     } { \clist_item:Nn \l__xdu_statement_sign_clist { 5 } }
+-            \par
++              { ^^^^672c^^^^4eba^^^^7b7e^^^^540d } { \clist_item:Nn \l__xdu_statement_sign_clist { 3 } }
++              { ^^^^5bfc^^^^5e08^^^^7b7e^^^^540d } { \clist_item:Nn \l__xdu_statement_sign_clist { 5 } }
++            \par\hspace{2em}
+             \__xdu_statement_scan_sign:nnnn
+-              { ^^^^65e5\qquad{}^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 4 } }
+-              { ^^^^65e5\qquad{}^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 6 } }
++              { ^^^^65e5\qquad ^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 4 } }
++              { ^^^^65e5\qquad ^^^^671f } { \clist_item:Nn \l__xdu_statement_sign_clist { 6 } }
+           }
+       }
+-    \cleardoublepage
+   }
+ \cs_new:Npn \__xdu_zh_abstract_keywords:
+   {
+     \__xdu_n_chapter_head_toc:nn
+       { ^^^^6458^^^^8981 }
+-      { \__xdu_sf_family: \mdseries ^^^^6458 { \quad } ^^^^8981 }
++      { \rmfamily \CJKfamily { \CJKsfdefault } \mdseries ^^^^6458^^^^8981 }
+     \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^6458^^^^8981 } }
+     \group_begin:
+       \dim_set:Nn \parindent { 2 \ccwd }
+       \rmfamily \zihao { -4 }
+-      \dim_set:Nn \baselineskip { 20pt }
+-      \file_if_exist_input:n { \l__xdu_abstract_zh_tl }
++      \dim_set:Nn \baselineskip { 20bp }
++      \file_if_exist_input:n { \l__xdu_abstract_zh_tl } \par
+     \group_end:
+     \group_begin:
+       \rmfamily \zihao { -4 }
+-      \dim_set:Nn \baselineskip { 20pt }
+-      \skip_vertical:n { 20pt }
++      \dim_set:Nn \baselineskip { 20bp }
++      \skip_vertical:n { 20bp }
+       \__xdu_typeout_keywords:nNn
+-        { \textbf { ^^^^5173^^^^952e^^^^8bcd } ^^^^ff1a } { \l__xdu_keywords_zh_clist } { ^^^^ff0c }
++        {
++          \BeginAccSupp{method=hex,unicode,ActualText=51730020952E00208BCDFF1A}
++          \textbf { ^^^^5173\hspace{.25em}^^^^952e\hspace{.25em}^^^^8bcd^^^^ff1a }
++          \EndAccSupp{}
++        } { \l__xdu_keywords_zh_clist } { ^^^^ff0c\space }
+     \group_end:
+     \cleardoublepage
+   }
+ \cs_new:Npn \__xdu_en_abstract_keywords:
+   {
+     \__xdu_n_chapter_head_toc_ii:nn
+-      { \textrm { ABSTRACT } } { \centering \rmfamily \zihao { 3 } \dim_set:Nn \baselineskip { 20pt } }
++      { \textrm { ABSTRACT } } { \centering \rmfamily \zihao { 3 } \dim_set:Nn \baselineskip { 20bp } }
+     \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { \textrm { ABSTRACT } } }
+     \group_begin:
+-      \dim_set:Nn \parskip { 20pt }
++      \dim_set:Nn \parindent { 0pt }
++      \dim_set:Nn \parskip { 20bp }
++      \dim_set:Nn \emergencystretch { 2em }
+       \rmfamily \zihao { -4 }
+-      \dim_set:Nn \baselineskip { 20pt }
+-      \file_if_exist:nT { \l__xdu_abstract_en_tl } { \skip_vertical:n { -20pt } }
+-      \file_if_exist_input:n { \l__xdu_abstract_en_tl }
++      \dim_set:Nn \baselineskip { 20bp }
++      \file_if_exist:nT { \l__xdu_abstract_en_tl } { \skip_vertical:n { -20bp } }
++      \file_if_exist_input:n { \l__xdu_abstract_en_tl } \par
+     \group_end:
+     \group_begin:
+       \rmfamily \zihao { -4 }
+-      \dim_set:Nn \baselineskip { 20pt }
+-      \skip_vertical:n { 20pt }
++      \dim_set:Nn \baselineskip { 20bp }
++      \skip_vertical:n { 20bp }
+       \__xdu_typeout_keywords:nNn
+-        { \textbf { Keywords } ^^^^ff1a } { \l__xdu_keywords_en_clist } { ,~ }
++        { \textbf { Keywords: } ~ } { \l__xdu_keywords_en_clist } { ,~ }
+     \group_end:
+     \cleardoublepage
+   }
+@@ -2419,7 +2262,6 @@
+       { \__xdu_lang_switch:nn { ^^^^63d2^^^^56fe^^^^7d22^^^^5f15 } { List~of~Figures } }
+     \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^63d2^^^^56fe^^^^7d22^^^^5f15 } }
+     \group_begin:
+-      \addtocontents { lof } { \vspace { 10pt } }
+       \renewcommand { \addvspace } [1] { }
+       \tl_set:Nn \cftfigpresnum {  \figurename \space }
+       \dim_zero_new:N \l__xdu_lof_label_dim
+@@ -2430,7 +2272,7 @@
+       \dim_add:Nn \cftfignumwidth { \l__xdu_lof_label_num_max_dim }
+       \dim_add:Nn \cftfignumwidth { .75em }
+       \dim_set:Nn \cftfigindent { 0pt }
+-      \rmfamily \zihao { -4 } \dim_set:Nn \baselineskip { 20pt }
++      \rmfamily \zihao { -4 } \dim_set:Nn \baselineskip { 20bp }
+       \@starttoc { lof }
+     \group_end:
+     \cleardoublepage
+@@ -2441,7 +2283,6 @@
+       { \__xdu_lang_switch:nn { ^^^^8868^^^^683c^^^^7d22^^^^5f15 } { List~of~Tables } }
+     \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^8868^^^^683c^^^^7d22^^^^5f15 } }
+     \group_begin:
+-      \addtocontents { lot } { \vspace { 10pt } }
+       \renewcommand { \addvspace } [1] { }
+       \tl_set:Nn \cfttabpresnum {  \tablename \space }
+       \dim_zero_new:N \l__xdu_lot_label_dim
+@@ -2452,7 +2293,7 @@
+       \dim_add:Nn \cfttabnumwidth { \l__xdu_lot_label_num_max_dim }
+       \dim_add:Nn \cfttabnumwidth { .75em }
+       \dim_set:Nn \cfttabindent { 0pt }
+-      \rmfamily \zihao { -4 } \dim_set:Nn \baselineskip { 20pt }
++      \rmfamily \zihao { -4 } \dim_set:Nn \baselineskip { 20bp }
+       \@starttoc { lot }
+     \group_end:
+     \cleardoublepage
+@@ -2611,22 +2452,17 @@
+ \RenewDocumentCommand { \frontmatter } { } { }
+ \cs_new:Npn \__xdu_frontmatter:
+   {
++    \__xdu_clear_review_info:
++    \__xdu_prepare_supervisors:
++    \bool_if:NT \l__xdu_anon_bool { \hypersetup { pdfauthor = {} } }
++    \hypersetup { pageanchor = false }
+     \loadgeometry { cover }
+     \pagestyle    { empty }
+     \dim_set:Nn \parindent { 0pt }
+-    \dim_set:Nn \baselineskip { 20pt }
++    \dim_set:Nn \baselineskip { 20bp }
+     \bool_if:NF \l__xdu_rm_cover_bool
+       {
+-        \vbox:n { }
+-        \skip_vertical:n { 435pt }
+-        \vbox_to_ht:nn { 120pt }
+-          {
+-            \rmfamily \zihao { 2 } \bfseries \__xdu_bold_math: \centering
+-            \dim_set:Nn \baselineskip { 30pt }
+-            \l__xdu_title_tl
+-          }
+-        \__xdu_cover_author_info:
+-        \cleardoublepage
++        \__xdu_cover:
+       }
+     \bool_if:NF \l__xdu_rm_title_page_bool
+       {
+@@ -2653,9 +2489,11 @@
+           { \__xdu_statement: }
+       }
+     \__xdu_load_main_geometry:
+-    \pagestyle     { front }
++    \bool_set_true:N \l__xdu_front_page_bool
++    \pagestyle     { plain }
+     \pagenumbering { Roman }
+-    \dim_set:Nn \baselineskip { 20pt }
++    \hypersetup { pageanchor = true }
++    \dim_set:Nn \baselineskip { 20bp }
+     \bool_if:NF \l__xdu_rm_abstract_bool
+       {
+         \__xdu_lang_switch:nn
+@@ -2675,8 +2513,12 @@
+         \setcounter { tocdepth } { 2 }
+         \__xdu_n_chapter_head:nn
+           { \__xdu_lang_switch:nn { ^^^^76ee^^^^5f55            } { Contents } }
+-          { \__xdu_lang_switch:nn { ^^^^76ee { \quad } ^^^^5f55 } { Contents } }
+-        \@starttoc { toc }
++          { \__xdu_lang_switch:nn { ^^^^76ee^^^^5f55 } { Contents } }
++        \group_begin:
++          \rmfamily \zihao { -4 }
++          \dim_set:Nn \baselineskip { 20bp }
++          \@starttoc { toc }
++        \group_end:
+         \cleardoublepage
+         \__xdu_lang_switch:nn { }
+           {
+@@ -2693,11 +2535,13 @@
+ \cs_new:Npn \__xdu_mainmatter:
+   {
+     \__xdu_load_main_geometry:
+-    \pagestyle     { plain  }
++    \bool_set_false:N \l__xdu_front_page_bool
++    \pagestyle     { plain }
+     \pagenumbering { arabic }
++    \skip_zero:N \parskip
+     \dim_set:Nn \parindent { 2 \ccwd }
+     \rmfamily \zihao { -4 }
+-    \dim_set:Nn \baselineskip { 20pt }
++    \dim_set:Nn \baselineskip { 20bp }
+     \__xdu_lang_switch:nn { }
+       {
+         \cs_new_eq:NN \__xdu_org_chapter:n \chapter
+@@ -2725,10 +2569,10 @@
+               { \numberline { \thesubsection } \IfNoValueTF { ##2 } { ##1 } { ##2 } }
+           }
+       }
+-    \dim_set:Nn \abovedisplayskip      { 12bp }
+-    \dim_set:Nn \belowdisplayskip      { 12bp }
+-    \dim_set:Nn \abovedisplayshortskip { 0bp  }
+-    \dim_set:Nn \belowdisplayshortskip { 12bp }
++    \dim_set:Nn \abovedisplayskip      { 20bp }
++    \dim_set:Nn \belowdisplayskip      { 20bp }
++    \dim_set:Nn \abovedisplayshortskip { 20bp }
++    \dim_set:Nn \belowdisplayshortskip { 20bp }
+   }
+ \ctex_at_end_preamble:n
+   {
+@@ -2745,7 +2589,7 @@
+             \begin { tblr }
+               {
+                 colspec = { @{ \skip_horizontal:N \l__xdu_bio_indent_dim } lX @{ } },
+-                rows    = { font = \zihao { -4 } \dim_set:Nn \baselineskip { 20pt } }
++                rows    = { font = \zihao { -4 } \dim_set:Nn \baselineskip { 20bp } }
+               }
+           }
+           {
+@@ -2771,6 +2615,19 @@
+       }
+   }
+ \RenewDocumentCommand { \backmatter } { } { }
++% Keep the consecutive bibliography, acknowledgements and biography entries
++% together when a long table of contents reaches the bottom of a page.
++\NewDocumentCommand \XDUTocKeepLines { m }
++  {
++    \par
++    \dim_compare:nNnT { \pagegoal } < { \c_max_dim }
++      {
++        \dim_compare:nNnT { \pagegoal - \pagetotal }
++          < { #1 \baselineskip + #1 \cftbeforechapskip }
++          { \newpage }
++      }
++  }
++
+ \cs_new:Npn \__xdu_backmatter:
+   {
+     \__xdu_appendix:
+@@ -2780,6 +2637,13 @@
+         \cs_set_eq:NN \section \__xdu_org_section:n
+         \cs_set_eq:NN \subsection \__xdu_org_subsection:n
+       }
++    \int_zero:N \l_tmpa_int
++    \bool_if:NF \l__xdu_rm_ref_bool { \int_incr:N \l_tmpa_int }
++    \bool_lazy_or:nnT { \l__xdu_anon_bool } { ! \l__xdu_rm_ack_bool }
++      { \int_incr:N \l_tmpa_int }
++    \bool_if:NF \l__xdu_rm_bio_bool { \int_incr:N \l_tmpa_int }
++    \int_compare:nNnT { \l_tmpa_int } > { 1 }
++      { \addtocontents { toc } { \protect \XDUTocKeepLines { \int_use:N \l_tmpa_int } } }
+     \bool_if:NF \l__xdu_rm_ref_bool
+       {
+         \cs_set:Npn \bibname { \__xdu_lang_switch:nn { ^^^^53c2^^^^8003^^^^6587^^^^732e } { Bibliography } }
+@@ -2801,16 +2665,16 @@
+             { \printbibliography }
+         }
+     \group_end:
+-    \bool_if:NF \l__xdu_rm_ack_bool
++    \bool_lazy_or:nnT { \l__xdu_anon_bool } { ! \l__xdu_rm_ack_bool }
+       {
+         \__xdu_n_chapter_head_toc:nn
+           { \__xdu_lang_switch:nn { ^^^^81f4^^^^8c22            } { Acknowledgements } }
+-          { \__xdu_lang_switch:nn { ^^^^81f4 { \quad } ^^^^8c22 } { Acknowledgements } }
++          { \__xdu_lang_switch:nn { ^^^^81f4^^^^8c22 } { Acknowledgements } }
+         \__xdu_lang_switch:nn { } { \__xdu_add_zh_toc:nn { chapter } { ^^^^81f4^^^^8c22 } }
+         \group_begin:
+           \dim_set:Nn \parindent { 2 \ccwd }
+           \rmfamily \zihao { -4 }
+-          \dim_set:Nn \baselineskip { 20pt }
++          \dim_set:Nn \baselineskip { 20bp }
+           \ctexset
+             {
+                 section    / number = { \arabic { section } . },
+@@ -2819,7 +2683,7 @@
+                 subsection / format = { \rmfamily \zihao { 4 } \bfseries \raggedright }
+             }
+           \setcounter { section } { 0 }
+-          \file_if_exist_input:n { \l__xdu_ack_tl }
++          \bool_if:NF \l__xdu_anon_bool { \file_if_exist_input:n { \l__xdu_ack_tl } \par }
+         \group_end:
+       }
+     \bool_if:NF \l__xdu_rm_bio_bool
+@@ -2830,7 +2694,7 @@
+         \group_begin:
+           \dim_set:Nn \parindent { 2 \ccwd }
+           \rmfamily \zihao { -4 }
+-          \dim_set:Nn \baselineskip { 20pt }
++          \dim_set:Nn \baselineskip { 20bp }
+           \ctexset
+             {
+                 section    / number = { \arabic { section } . },

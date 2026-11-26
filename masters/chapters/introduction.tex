@@ -1,0 +1,29 @@
+\chapter{Introduction}
+\section{Background}
+This chapter demonstrates the heading hierarchy and the use of citations\cite{knuth1984}.
+\subsection{Cross-references}
+Refer to Figure~\ref{fig:example}, Table~\ref{tab:example}, and Equation~\eqref{eq:example} from the text.
+\subsubsection{Formatting examples}
+\begin{figure}[htbp]
+  \centering
+  \fbox{\rule{0pt}{25mm}\rule{.45\linewidth}{0pt}}
+  \caption{Sample figure}
+  \label{fig:example}
+\end{figure}
+\begin{table}[htbp]
+  \caption{Sample measurements}
+  \label{tab:example}
+  \centering
+  \begin{tabular}{cc}
+    \hline
+    Item & Length (\unit{\metre}) \\
+    \hline
+    A & \num{1350} \\
+    B & \num{2700} \\
+    \hline
+  \end{tabular}
+\end{table}
+\begin{equation}
+  \label{eq:example}
+  a + b = c .
+\end{equation}

@@ -1,0 +1,24 @@
+/build/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.pdf
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+/fonts/
+
+# The upstream repo ignores generated TeX files. Include this starter's sources.
+!/*.tex
+!/*.cls
+!/back/*.tex
+!/chapters/*.tex
+!/front/*.tex

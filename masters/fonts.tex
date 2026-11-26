@@ -1,0 +1,87 @@
+% \XDUFontDirectory may override the default fonts/ directory (include a trailing slash).
+\xdusetup{style={cjk-font=none, math-font=xits}}
+\newcommand*{\XDUFontFallback}[1]{%
+  \ifdefined\XDURequireSchoolFonts
+    \PackageError{xdu-master}{School font unavailable: #1}%
+      {Put licensed font files in \XDUFontDirectory\space or install them on the system.}%
+  \else
+    \PackageWarningNoLine{xdu-master}{Preview font substituted for #1}%
+  \fi
+}
+\newcommand*{\XDUUsePreviewSong}{%
+  \IfFileExists{\XDUFontDirectory FandolSong-Regular.otf}{%
+    \setCJKmainfont[Path=\XDUFontDirectory,AutoFakeBold=2.4]{FandolSong-Regular.otf}%
+    \setCJKmonofont[Path=\XDUFontDirectory]{FandolSong-Regular.otf}%
+  }{%
+    \IfFontExistsTF{FandolSong-Regular.otf}{%
+      \setCJKmainfont[BoldFont=FandolSong-Bold.otf]{FandolSong-Regular.otf}%
+      \setCJKmonofont{FandolSong-Regular.otf}%
+    }{%
+      \IfFontExistsTF{Songti SC}{%
+        \setCJKmainfont{Songti SC}\setCJKmonofont{Songti SC}%
+      }{\setCJKmainfont{Noto Serif CJK SC}\setCJKmonofont{Noto Serif CJK SC}}%
+    }%
+  }%
+}
+\newcommand*{\XDUUsePreviewHei}{%
+  \IfFileExists{\XDUFontDirectory FandolHei-Regular.otf}{%
+    \setCJKsansfont[Path=\XDUFontDirectory,AutoFakeBold=2.4]{FandolHei-Regular.otf}%
+  }{%
+    \IfFontExistsTF{FandolHei-Regular.otf}{%
+      \setCJKsansfont[BoldFont=FandolHei-Bold.otf]{FandolHei-Regular.otf}%
+    }{%
+      \IfFontExistsTF{Heiti SC}{\setCJKsansfont{Heiti SC}}{\setCJKsansfont{Noto Sans CJK SC}}%
+    }%
+  }%
+}
+
+\ExplSyntaxOn
+\NewDocumentCommand \XDUUseSchoolTimes { }
+  {
+    \__xdu_if_local_font_family:nnnnTF { times.ttf } { timesbd.ttf } { timesi.ttf } { timesbi.ttf }
+      {
+        \xdusetup { style/latin-font=none }
+        \setmainfont
+          [ Path=\XDUFontDirectory, BoldFont=timesbd.ttf, ItalicFont=timesi.ttf, BoldItalicFont=timesbi.ttf ]
+          { times.ttf }
+      }
+      {
+        \IfFontExistsTF { Times~New~Roman }
+          { \xdusetup { style/latin-font=none } \setmainfont { Times~New~Roman } }
+          { \XDUFontFallback { Times~New~Roman } }
+      }
+  }
+\ExplSyntaxOff
+
+\newcommand*{\XDUUseSchoolSong}{%
+  \IfFileExists{\XDUFontDirectory simsun.ttc}{%
+    \setCJKmainfont[Path=\XDUFontDirectory,FontIndex=0,AutoFakeBold=2.4]{simsun.ttc}%
+    \setCJKmonofont[Path=\XDUFontDirectory,FontIndex=0]{simsun.ttc}%
+  }{%
+    \IfFontExistsTF{SimSun}{%
+      \setCJKmainfont[AutoFakeBold=2.4]{SimSun}\setCJKmonofont{SimSun}%
+    }{\XDUFontFallback{SimSun}\XDUUsePreviewSong}%
+  }%
+}
+\newcommand*{\XDUUseSchoolHei}{%
+  \IfFileExists{\XDUFontDirectory simhei.ttf}{%
+    \setCJKsansfont[Path=\XDUFontDirectory,AutoFakeBold=2.4]{simhei.ttf}%
+  }{%
+    \IfFontExistsTF{SimHei}{%
+      \setCJKsansfont[AutoFakeBold=2.4]{SimHei}%
+    }{\XDUFontFallback{SimHei}\XDUUsePreviewHei}%
+  }%
+}
+\newcommand*{\XDUUseSchoolFonts}{%
+  \XDUUseSchoolTimes\XDUUseSchoolSong\XDUUseSchoolHei
+}
+\ifdefined\XDURequireSchoolFonts
+  \XDUUseSchoolFonts
+\else
+  \ifdefined\XDUPreviewFonts
+    \typeout{xdu-master: using the explicitly selected preview font profile}%
+    \XDUUsePreviewSong\XDUUsePreviewHei
+  \else
+    \XDUUseSchoolFonts
+  \fi
+\fi

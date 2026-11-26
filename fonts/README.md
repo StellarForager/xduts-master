@@ -1,0 +1,1 @@
+Place local copies of `simsun.ttc`, `simhei.ttf`, `times.ttf`, `timesbd.ttf`, `timesi.ttf`, and `timesbi.ttf` here. The template also accepts `XITSMath-Regular.otf` in this directory. Font files are ignored by Git.

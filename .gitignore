@@ -27,3 +27,6 @@
 build
 test
 xduts.pdf
+
+/fonts/*
+!/fonts/README.md
