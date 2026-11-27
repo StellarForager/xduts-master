@@ -1136,24 +1136,26 @@
 \newgeometry
   {
     top           = 3cm,
-    bottom        = 2cm,
+    bottom        = 1.75cm,
+    includefoot,
     inner         = 2.5cm,
     outer         = 2.5cm,
     bindingoffset = 0.5cm,
     headheight    = 18bp,
     headsep       = 6bp,
-    footskip      = 15bp
+    footskip      = 23bp
   }
 \savegeometry { main }
 \newgeometry
   {
     top        = 3cm,
-    bottom     = 2cm,
+    bottom     = 1.75cm,
+    includefoot,
     inner      = 2.75cm,
     outer      = 2.75cm,
     headheight = 18bp,
     headsep    = 6bp,
-    footskip   = 15bp
+    footskip   = 23bp
   }
 \savegeometry { main-sym }
 \newgeometry
@@ -1212,14 +1214,8 @@
       {
         \fancyfoot [ C ]
           {
-            \smash
-              {
-                \raisebox{12bp}
-                  {
-                    \bool_if:NTF \l__xdu_front_page_bool { \rmfamily } { \CJKfamily+{rm} }
-                    \zihao{-5}\thepage
-                  }
-              }
+            \bool_if:NTF \l__xdu_front_page_bool { \rmfamily } { \CJKfamily+{rm} }
+            \zihao{-5}\thepage
           }
       }
     \cs_set:Npn \headrulewidth { 0.5bp }
@@ -2199,9 +2195,7 @@
       \skip_vertical:n { 20bp }
       \__xdu_typeout_keywords:nNn
         {
-          \BeginAccSupp{method=hex,unicode,ActualText=51730020952E00208BCDFF1A}
-          \textbf { 关\hspace{.25em}键\hspace{.25em}词： }
-          \EndAccSupp{}
+          \textbf { 关\hbox{\char32\relax}键\hbox{\char32\relax}词 } ：
         } { \l__xdu_keywords_zh_clist } { ，\space }
     \group_end:
     \cleardoublepage
