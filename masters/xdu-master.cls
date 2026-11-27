@@ -2195,7 +2195,7 @@
       \skip_vertical:n { 20bp }
       \__xdu_typeout_keywords:nNn
         {
-          \textbf { 关\hbox{\char32\relax}键\hbox{\char32\relax}词 } ：
+          \textbf { 关{~}键{~}词 } ：
         } { \l__xdu_keywords_zh_clist } { ，\space }
     \group_end:
     \cleardoublepage
